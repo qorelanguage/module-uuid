@@ -1,0 +1,40 @@
+Qore UUID module (uuid)
+
+INTRODUCTION
+------------
+The Qore uuid module provides the ability to generate and parse UUIDs, Universally Unique IDentifiers
+For more information about UUIDs, see:
+    	http://en.wikipedia.org/wiki/Universally_Unique_Identifier
+
+Basically this module provides a Qore-language API to libuuid
+	http://www.ossp.org/pkg/lib/uuid/
+
+see docs for more information
+
+
+BUILDING
+--------
+Requires qore 0.8.0+ and libuuid to build and run
+
+to configure the build, execute
+   	configure --disable-debug
+
+if the qore library cannot be found, then you can use:
+   	configure --disable-debug --with-qore=<dir>
+
+if libyaml cannot be found, then you can use:
+   	configure --disable-debug --with-libuuid=<dir>
+
+The qore binary also needs to be in the path so configure can determine the module directory
+
+Then execute
+
+make && make install
+
+(or 'make && sudo make install' as needed)
+
+please direct any questions to:
+david@qore.org
+
+or you can post in the qore forums at
+        http://qore.org/forums

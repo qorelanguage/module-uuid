@@ -1,0 +1,7 @@
+***********
+version 0.9
+***********
+
+Initial release of the uuid module
+Requires qore 0.8.0+ to build and run
+see README and docs for more information
