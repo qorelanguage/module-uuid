@@ -30,7 +30,7 @@
 
 #include <uuid.h>
 
-#ifndef _UUID_STRING_t
+#ifndef _UUID_STRING_T
 typedef char* uuid_string_t;
 #endif
 
@@ -75,7 +75,7 @@ public:
    }
 
    DLLLOCAL int set(const QoreString &uuid_str, ExceptionSink *xsink) {
-      if (uuid_parse((uuid_string_t)uuid_str.getBuffer(), uuid)) {
+      if (uuid_parse((char *)uuid_str.getBuffer(), uuid)) {
          QoreStringNode *desc = new QoreStringNode("cannot parse string argument '");
          desc->concat(&uuid_str, xsink);
          desc->concat("' as a UUID string (must be in format like ex: '1b4e28ba-2fa1-11d2-883f-b9a761bde3fb')");
@@ -94,13 +94,13 @@ public:
       str->allocate(37);
 
       if (flag & QUF_UPPER_CASE) {
-         uuid_unparse_upper(uuid, (uuid_string_t)str->getBuffer());
+         uuid_unparse_upper(uuid, (char *)str->getBuffer());
       }
       else if (flag & QUF_LOWER_CASE) {
-         uuid_unparse_lower(uuid, (uuid_string_t)str->getBuffer());
+         uuid_unparse_lower(uuid, (char *)str->getBuffer());
       }
       else {
-         uuid_unparse(uuid, (uuid_string_t)str->getBuffer());
+         uuid_unparse(uuid, (char *)str->getBuffer());
       }
       str->terminate(36);
       return str;

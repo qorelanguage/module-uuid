@@ -262,6 +262,12 @@ check_uuid() {
 
     lib="$1/lib${LIBSUFFIX}"
 
+    if test -n "$darwin" -a "$1" = "/usr"; then
+       with_uuid_libs=System
+       uuid_app_includes=true
+       return
+    fi
+
     if test -f "$lib/libuuid.${SHLIB_SUFFIX}" -o -f "$lib/libuuid.so"; then
        with_uuid_libs=$lib
     elif test -f "$lib/uuid/libuuid.${SHLIB_SUFFIX}"; then
@@ -330,7 +336,7 @@ if test "${with_uuid}" = yes; then
      else
 	if test -n "$uuid_app_libs"; then
 	   UUID_LIBS="-L$with_uuid_libs -luuid"
-	else
+	elif test "$with_uuid_libs" != "System"; then
 	   UUID_LIBS="-luuid"
 	fi
      fi
