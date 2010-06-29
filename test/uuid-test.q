@@ -32,6 +32,8 @@ class uuid_test {
 
 	$uuid = new UUID("1b4e28ba-2fa1-11d2-883f-b9a761bde3fb");
 	$.doTests($uuid, "literal");
+
+	printf("%d tests completed successfully, %d error%s\n", elements $.ehash, $.errors, $.errors == 1 ? "" : "s");
     }
 
     doTests(UUID $uuid, string $type) {

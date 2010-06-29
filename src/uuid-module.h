@@ -56,7 +56,7 @@ public:
    }
 
    DLLLOCAL QoreUUID(const QoreUUID &old) {
-      uuid_copy(uuid, (uuid_t)old.uuid);
+      uuid_copy(uuid, const_cast<QoreUUID &>(old).uuid);
    }
 
    DLLLOCAL void generate(int flag = QUF_NONE) {
@@ -107,7 +107,7 @@ public:
    }
 
    DLLLOCAL bool isNull() const {
-      return uuid_is_null((uuid_t)uuid);
+      return uuid_is_null(const_cast<QoreUUID *>(this)->uuid);
    }
 
    DLLLOCAL void clear() {
@@ -115,7 +115,7 @@ public:
    }
 
    DLLLOCAL int compare(const QoreUUID &other) {
-      return uuid_compare(uuid, (uuid_t)other.uuid);
+      return uuid_compare(uuid, const_cast<QoreUUID &>(other).uuid);
    }
 };
 
