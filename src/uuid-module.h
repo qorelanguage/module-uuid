@@ -56,7 +56,7 @@ public:
    }
 
    DLLLOCAL QoreUUID(const QoreUUID &old) {
-      uuid_copy(uuid, old.uuid);
+      uuid_copy(uuid, (uuid_t)old.uuid);
    }
 
    DLLLOCAL void generate(int flag = QUF_NONE) {
@@ -93,21 +93,21 @@ public:
       QoreStringNode *str = new QoreStringNode();
       str->allocate(37);
 
-      if (flag & QUF_UPPER_CASE) {
+#ifdef HAVE_UUID_UNPARSE_CASE
+      if (flag & QUF_UPPER_CASE)
          uuid_unparse_upper(uuid, (char *)str->getBuffer());
-      }
-      else if (flag & QUF_LOWER_CASE) {
+      else if (flag & QUF_LOWER_CASE)
          uuid_unparse_lower(uuid, (char *)str->getBuffer());
-      }
-      else {
+      else
+#endif
          uuid_unparse(uuid, (char *)str->getBuffer());
-      }
+
       str->terminate(36);
       return str;
    }
 
    DLLLOCAL bool isNull() const {
-      return uuid_is_null(uuid);
+      return uuid_is_null((uuid_t)uuid);
    }
 
    DLLLOCAL void clear() {
@@ -115,7 +115,7 @@ public:
    }
 
    DLLLOCAL int compare(const QoreUUID &other) {
-      return uuid_compare(uuid, other.uuid);
+      return uuid_compare(uuid, (uuid_t)other.uuid);
    }
 };
 

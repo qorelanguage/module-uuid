@@ -340,6 +340,7 @@ if test "${with_uuid}" = yes; then
 	   UUID_LIBS="-luuid"
 	fi
      fi
+
      # check for uuid_string_t
      #AC_MSG_CHECKING([for uuid_strint_t in uuid.h])
      #if test -n "`grep uuid_strint_t $with_uuid_includes/uuid.h`"; then
@@ -348,6 +349,16 @@ if test "${with_uuid}" = yes; then
      #else
      #   AC_MSG_RESULT([no])
      #fi
+
+     # check for uuid_unparse_upper() and uuid_unparse_lower()
+     AC_MSG_CHECKING([for uuid_unparse_upper() and uuid_unparse_lower()])
+     uuid_ul="`grep -e uuid_unparse_upper -e uuid_unparse_lower $with_uuid_includes/uuid.h 2>/dev/null`"
+     if test -n "$uuid_ul"; then
+     	AC_DEFINE(HAS_UUID_UNPARSE_CASE, 1, [if uuid_unparse_lower() and uuid_unparse_upper() are available])
+ 	AC_MSG_RESULT([yes])
+     else
+	AC_MSG_RESULT([no])
+     fi
 
      # check if C++ compiler can link with UUID libs
      SAVE_CXXFLAGS="$CXXFLAGS"

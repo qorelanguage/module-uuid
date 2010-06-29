@@ -42,7 +42,7 @@ qore_classid_t CID_UUID;
 
 // UUID::constructor(int $flag = UUID::None)
 static void UUID_constructor_int(QoreObject *self, const QoreListNode *params, ExceptionSink *xsink) {
-   self->setPrivate(CID_UUID, new QoreUUID(HARD_QORE_INT(params, 0)));
+   self->setPrivate(CID_UUID, new QoreUUID((int)HARD_QORE_INT(params, 0)));
 }
 
 // UUID::constructor(string $uuid_str)
@@ -60,7 +60,7 @@ static void UUID_copy(QoreObject *self, QoreObject *old, QoreUUID *uuid, Excepti
 
 // UUID::toString(int $flags = UUID::None) returns string
 static AbstractQoreNode *UUID_toString(QoreObject *self, QoreUUID *uuid, const QoreListNode *params, ExceptionSink *xsink) {
-   return uuid->toString(HARD_QORE_INT(params, 0));
+   return uuid->toString((int)HARD_QORE_INT(params, 0));
 }
 
 // UUID::isNull() returns bool
@@ -76,7 +76,7 @@ static AbstractQoreNode *UUID_clear(QoreObject *self, QoreUUID *uuid, const Qore
 
 // UUID::generate(int $flags = UUID::None) returns nothing
 static AbstractQoreNode *UUID_generate(QoreObject *self, QoreUUID *uuid, const QoreListNode *params, ExceptionSink *xsink) {
-   uuid->generate(HARD_QORE_INT(params, 0));
+   uuid->generate((int)HARD_QORE_INT(params, 0));
    return 0;
 }
 
@@ -140,6 +140,12 @@ QoreStringNode *uuid_module_init() {
    UNS.addConstant("Random",    new QoreBigIntNode(QUF_RANDOM));
    UNS.addConstant("Time",      new QoreBigIntNode(QUF_TIME));
    UNS.addConstant("Empty",     new QoreBigIntNode(QUF_EMPTY));
+
+#ifdef HAVE_UUID_UNPARSE_CASE
+   UNS.addConstant("HAVE_UNPARSE_CASE", &True);
+#else
+   UNS.addConstant("HAVE_UNPARSE_CASE", &False);
+#endif
 
    return 0;
 }

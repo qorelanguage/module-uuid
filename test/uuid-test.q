@@ -38,8 +38,10 @@ class uuid_test {
 	printf("%s UUID %n\n", $type, $uuid.toString());
 
 	$.test_value($uuid.isNull(), False, $type, "UUID::isNull()");
-	$.test_value($uuid.toString(UUID::LowerCase) =~ /^[\-0-9a-f]+$/, True, $type, "UUID::toString(LowerCase)");
-	$.test_value($uuid.toString(UUID::UpperCase) =~ /^[\-0-9A-F]+$/, True, $type, "UUID::toString(UpperCase)");
+	if (UUID::HAVE_UNPARSE_CASE)
+	    $.test_value($uuid.toString(UUID::LowerCase) =~ /^[\-0-9a-f]+$/, True, $type, "UUID::toString(LowerCase)");
+	    $.test_value($uuid.toString(UUID::UpperCase) =~ /^[\-0-9A-F]+$/, True, $type, "UUID::toString(UpperCase)");
+	}
 
 	my UUID $other = $uuid.copy();
 	$.test_value($uuid.compare($other), 0, $type, "UUID::copy()");
