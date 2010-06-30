@@ -34,7 +34,7 @@
 
 Summary: UUID module for Qore
 Name: qore-uuid-module
-Version: 0.9
+Version: 1.1
 Release: 1%{dist}
 License: LGPL
 Group: Development/Languages
@@ -79,5 +79,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING README RELEASE-NOTES ChangeLog AUTHORS test/uuid-test.q docs/uuid-module-doc.html
 
 %changelog
+* Wed Jun 30 2010 David Nichols <david@qore.org>
+- updated version to 1.1
+
 * Tue Jun 29 2010 David Nichols <david@qore.org>
 - initial spec file for uuid module

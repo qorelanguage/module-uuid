@@ -538,7 +538,7 @@ You can reach me at: mailto:david_nichols@users.sourceforge.net</pre>
 <pre>[[Introduction]]
 [[UUID Class]]</pre>
 </div>
-<div title="Introduction" modifier="DavidNichols" created="200808200719" modified="201006291056" changecount="76">
+<div title="Introduction" modifier="DavidNichols" created="200808200719" modified="201006301047" changecount="79">
 <pre>The uuid module provides the ability to generate and parse [[UUIDs|http://en.wikipedia.org/wiki/Universally_Unique_Identifier]] (Universally Unique Identifiers).
 
 This module is released under the [[LGPL 2.1|http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html]] and is tagged as such in the module's header (meaning it can be loaded unconditionally regardless of how the Qore library was initialized).
@@ -547,7 +547,14 @@ Note that this documentation is based on [[TiddlyWiki|http://www.tiddlywiki.com]
 
 Like all Qore components, the uuid module is thread-safe.
 
-This module provides the [[UUID Class]], [[UUID Generation Constants]], and [[UUID String Formatting Constants]].</pre>
+This module provides the [[UUID Class]], [[UUID Generation Constants]], [[UUID String Formatting Constants]], and one additional constant: {{{HAVE_UNPARSE_CASE}}}, which tells if the underlying uuid library support controlling the case of UUID strings (the use of constants {{{LowerCase}}} and {{{UpperCase}}} with [[UUID::toString()]]).
+
+Note that the [[UUID Class]] and all constants are provided in the {{{UUID}}} namespace.
+
+To simply get a UUID string without creating a UUID object, call static method [[UUID::get()]] as follows:
+{{{
+my string $uuid = UUID::get();
+}}}</pre>
 </div>
 <div title="MainMenu" modifier="DavidNichols" created="200808200730" modified="201006291133" changecount="39">
 <pre>[[Introduction]]
@@ -561,8 +568,8 @@ This module provides the [[UUID Class]], [[UUID Generation Constants]], and [[UU
 <div title="SiteTitle" modifier="DavidNichols" created="200808200717" modified="201006290822" changecount="30">
 <pre>Qore uuid Module Documentation</pre>
 </div>
-<div title="UUID Class" creator="DavidNichols" modifier="DavidNichols" created="201006291059" modified="201006291131" changecount="9">
-<pre>The ~UUID class provides methods that allow UUIDs to be created, manipulated, and parsed.
+<div title="UUID Class" creator="DavidNichols" modifier="DavidNichols" created="201006291059" modified="201006301047" changecount="14">
+<pre>The UUID class provides methods that allow ~UUIDs to be created, manipulated, and parsed.
 
 |!Method|!Description|h
 |[[UUID::constructor(int $flags = UUID::None)|UUID::constructor()]]&lt;br&gt;[[UUID::constructor(string $uuid_str)|UUID::constructor()]]|generates a UUID or parses a string to construct a UUID|
@@ -571,7 +578,9 @@ This module provides the [[UUID Class]], [[UUID Generation Constants]], and [[UU
 |[[UUID::compare(UUID $other) returns int|UUID::compare()]]|compares the current UUID with another UUID and returns -1, 0, or 1 if the other UUID is greater than, equal to, or less than the current UUID respectively|
 |[[UUID::generate(int $flags = UUID::None) returns nothing|UUID::generate()]]|generates a new UUID for the object|
 |[[UUID::isNull() returns bool|UUID::isNull()]]|returns True if the current UUID is the null UUID, or False if not|
-|[[UUID::toString(int $flags = UUID::None) returns string|UUID::toString()]]|returns the string representation of the UUID|</pre>
+|[[UUID::toString(int $flags = UUID::None) returns string|UUID::toString()]]|returns the string representation of the UUID|
+|[[static UUID::get(int $gen_flags = UUID::None, int $str_flags = UUID::None) returns string|UUID::get()]]|returns a UUID string without having to create a UUID object|
+</pre>
 </div>
 <div title="UUID Generation Constants" creator="DavidNichols" modifier="DavidNichols" created="201006291115" modified="201006291118" changecount="3">
 <pre>UUID generation constants affect how the UUID is generated.  All UUID generation constants are integers.
@@ -582,50 +591,62 @@ This module provides the [[UUID Class]], [[UUID Generation Constants]], and [[UU
 |{{{Time}}}|Force the use of the alternative algorithm that uses the current time and local ethernet MAC address (if available); note that this algorithm can leak information about when and where  the UUID was generated|
 |{{{Empty}}}|The UUID will be assigned the null value on creation|</pre>
 </div>
-<div title="UUID String Formatting Constants" creator="DavidNichols" modifier="DavidNichols" created="201006291116" changecount="1">
+<div title="UUID String Formatting Constants" creator="DavidNichols" modifier="DavidNichols" created="201006291116" modified="201006291354" changecount="2">
 <pre>UUID string generation constants affect how strings are created from UUID objects.  All UUID string generation constants are integers.
+
+Note that the constants {{{LowerCase}}} and {{{UpperCase}}} only have an effect if the underlying uuid library supports this functionality; check the constant {{{UUID::HAVE_UNPARSE_CASE}}} first before relying on this functionality.
 
 |!Constant|!Description|h
 |{{{None}}}|No value; this is the default|
 |{{{UpperCase}}}|All hexadecimal characters will be in upper case|
-|{{{LowerCase}}}|All hexadecimal characters will be in lower case||</pre>
+|{{{LowerCase}}}|All hexadecimal characters will be in lower case|</pre>
 </div>
-<div title="UUID::clear()" creator="DavidNichols" modifier="DavidNichols" created="201006291122" modified="201006291122" changecount="2">
+<div title="UUID::clear()" creator="DavidNichols" modifier="DavidNichols" created="201006291122" modified="201006301049" changecount="4">
 <pre>!Synopsis
 :Clears the UUID and sets the null value (&quot;00000000-0000-0000-0000-000000000000&quot;).
 !Prototype
-:{{{UUID::clear() returns nothing)}}}
+:* {{{UUID::clear() returns nothing)}}}
 !Example:
-:{{{$uuid.clear()();}}}</pre>
+{{{
+$uuid.clear();
+}}}</pre>
 </div>
-<div title="UUID::compare()" creator="DavidNichols" modifier="DavidNichols" created="201006291123" modified="201006291130" changecount="5">
+<div title="UUID::compare()" creator="DavidNichols" modifier="DavidNichols" created="201006291123" modified="201006301050" changecount="7">
 <pre>!Synopsis
 :Compares the current UUID with another UUID and returns -1, 0, or 1 if the other UUID is greater than, equal to, or less than the current UUID respectively
 !Prototype
-:{{{UUID::compare(UUID $other) returns int}}}
+:* {{{UUID::compare(UUID $other) returns int}}}
 !Arguments
-:{{{UUID $other}}}: the other UUID to compare
+:* {{{UUID $other}}}: the other UUID to compare
 !Return Value
 :{{{int}}}: -1, 0, or 1 if the other UUID is greater than, equal to, or less than the current UUID respectively
 !Example:
-:{{{my int $rc = $uuid.compare($other_uuid);}}}</pre>
+{{{
+my int $rc = $uuid.compare($other_uuid);
+}}}</pre>
 </div>
-<div title="UUID::constructor()" creator="DavidNichols" modifier="DavidNichols" created="201006291108" modified="201006291131" changecount="21">
+<div title="UUID::constructor()" creator="DavidNichols" modifier="DavidNichols" created="201006291108" modified="201006301049" changecount="30">
 <pre>!Synopsis
 :Generates a UUID or parses a string to construct a UUID.
 !Prototype
-:{{{UUID::constructor(int $flags = UUID::None)}}}
-:{{{UUID::constructor(string $uuid_str)}}}
+:* {{{UUID::constructor(int $flags = UUID::None)}}}
+:* {{{UUID::constructor(string $uuid_str)}}}
 !Arguments
 :* {{{int $flags}}}: [[UUID Generation Constants]] to affect how the UUID is generated
 :* {{{string $uuid_str}}}: a UUID string in a format as in the following example {{{&quot;93c40733-9b99-46c6-91a5-f3989067dc1e&quot;}}}
-!Example:
-:to generate a UUID using the default algorithm:
-::{{{my UUID $uuid(); }}}&lt;br&gt;&lt;br&gt;
-:to make a UUID object from an explicit value:
-::{{{my UUID $uuid(&quot;93c40733-9b99-46c6-91a5-f3989067dc1e&quot;); }}}&lt;br&gt;&lt;br&gt;
-:to create a UUID with the null value:
-::{{{my UUID $uuid(UUID::Empty)}}}
+!Examples:
+to generate a UUID using the default algorithm:
+{{{
+my UUID $uuid();
+}}}
+to make a UUID object from an explicit value:
+{{{
+my UUID $uuid(&quot;93c40733-9b99-46c6-91a5-f3989067dc1e&quot;);
+}}}
+to create a UUID with the null value:
+{{{
+my UUID $uuid(UUID::Empty)
+}}}
 !Exceptions
 :{{{UUID-CONSTRUCTOR-ERROR}}}: invalid UUID string (invalid format, invalid characters, etc)</pre>
 </div>
@@ -635,40 +656,63 @@ This module provides the [[UUID Class]], [[UUID Generation Constants]], and [[UU
 !Example
 :{{{my UUID $new_uuid = $uuid.copy();}}}</pre>
 </div>
-<div title="UUID::generate()" creator="DavidNichols" modifier="DavidNichols" created="201006291126" modified="201006291126" changecount="2">
+<div title="UUID::generate()" creator="DavidNichols" modifier="DavidNichols" created="201006291126" modified="201006301050" changecount="5">
 <pre>!Synopsis
 :Generates a new UUID value for the object; the current value of the UUID object is overwritten with the newly-generated value.
 !Prototype
-:{{{UUID::generate(int $flags = UUID::None) returns nothing}}}
+:* {{{UUID::generate(int $flags = UUID::None) returns nothing}}}
 !Arguments
-:{{{int $flags}}}: [[UUID Generation Constants]] to affect how the UUID is generated
-!Example:
-:to generate a UUID using the default algorithm:
-::{{{$uuid.generate(); }}}&lt;br&gt;&lt;br&gt;
-:to create a UUID with the null value:
-::{{{$uuid.generate(UUID::Empty)}}}</pre>
+:* {{{int $flags}}}: [[UUID Generation Constants]] to affect how the UUID is generated
+!Examples:
+to generate a UUID using the default algorithm:
+{{{
+$uuid.generate();
+}}}
+to create a UUID with the null value:
+{{{
+$uuid.generate(UUID::Empty);
+}}}</pre>
 </div>
-<div title="UUID::isNull()" creator="DavidNichols" modifier="DavidNichols" created="201006291129" modified="201006291130" changecount="2">
+<div title="UUID::get()" creator="DavidNichols" modifier="DavidNichols" created="201006301043" modified="201006301051" changecount="4">
 <pre>!Synopsis
-:Returns True if the current UUID is the null UUID, or False if not.
+:Returns a UUID string without having to create a UUID object.  Note that the constants {{{LowerCase}}} and {{{UpperCase}}} only have an effect if the underlying uuid library supports this functionality; check the constant {{{UUID::HAVE_UNPARSE_CASE}}} first before relying on this functionality.
 !Prototype
-:{{{UUID::isNull() returns bool}}}
-!Return Value
-:{{{bool}}}: True if the UUID is the null UUID, or False if not
-!Example:
-:{{{my bool $b = $uuid.isNull();}}}</pre>
-</div>
-<div title="UUID::toString()" creator="DavidNichols" modifier="DavidNichols" created="201006291132" changecount="1">
-<pre>!Synopsis
-:Returns the string representation of the UUID
-!Prototype
-:{{{UUID::toString(int $flags = UUID::None) returns string}}}
+:* {{{static UUID::get(int $gen_flags = UUID::None, int $str_flags = UUID::None) returns string}}}
 !Arguments
-:{{{int $flags}}}: [[UUID String Formatting Constants]] to affect how the UUID string return value is formatted
+:* {{{int $gen_flags}}}: [[UUID Generation Constants]] to affect how the UUID is generated
+:* {{{int $str_flags}}}: [[UUID String Formatting Constants]] to affect how the UUID string return value is formatted
 !Return Value
 :{{{string}}}: the string representation of the UUID, ex {{{&quot;f5c5fd74-5b3e-4f02-8772-f8a80da9b028&quot;}}}
 !Example:
-:{{{my string $str = $uuid.toString();}}}</pre>
+{{{
+my string $str = UUID::get();
+}}}</pre>
+</div>
+<div title="UUID::isNull()" creator="DavidNichols" modifier="DavidNichols" created="201006291129" modified="201006301050" changecount="3">
+<pre>!Synopsis
+:Returns True if the current UUID is the null UUID, or False if not.
+!Prototype
+:* {{{UUID::isNull() returns bool}}}
+!Return Value
+:{{{bool}}}: True if the UUID is the null UUID, or False if not
+!Example:
+{{{
+my bool $b = $uuid.isNull();
+}}}</pre>
+</div>
+<div title="UUID::toString()" creator="DavidNichols" modifier="DavidNichols" created="201006291132" modified="201006301051" changecount="6">
+<pre>!Synopsis
+:Returns the string representation of the UUID.  Note that the constants {{{LowerCase}}} and {{{UpperCase}}} only have an effect if the underlying uuid library supports this functionality; check the constant {{{UUID::HAVE_UNPARSE_CASE}}} first before relying on this functionality.
+!Prototype
+:* {{{UUID::toString(int $flags = UUID::None) returns string}}}
+!Arguments
+:* {{{int $flags}}}: [[UUID String Formatting Constants]] to affect how the UUID string return value is formatted
+!Return Value
+:{{{string}}}: the string representation of the UUID, ex {{{&quot;f5c5fd74-5b3e-4f02-8772-f8a80da9b028&quot;}}}
+!Example:
+{{{
+my string $str = $uuid.toString();
+}}}</pre>
 </div>
 </div>
 <!--POST-STOREAREA-->

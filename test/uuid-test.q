@@ -1,6 +1,6 @@
 #!/usr/bin/env qore
 
-%requires uuid
+%requires uuid >= 1.1
 
 # the uuid module requires qore 0.8.0+, so we know we have types
 %require-types
@@ -32,6 +32,12 @@ class uuid_test {
 
 	$uuid = new UUID("1b4e28ba-2fa1-11d2-883f-b9a761bde3fb");
 	$.doTests($uuid, "literal");
+
+	my string $str = UUID::get();
+	$uuid = new UUID($str);
+	my string $str2 = $uuid.toString();
+	$.test_value($str, $str2, "parsed", "static UUID::get()");
+	$.doTests($uuid, "parsed");
 
 	printf("%d tests completed successfully, %d error%s\n", elements $.ehash, $.errors, $.errors == 1 ? "" : "s");
     }
@@ -71,6 +77,6 @@ class uuid_test {
 	    stdout.printf("ERROR: %s %s test failed! (%N != %N)\n", $type, $msg, $v1, $v2);
 	    ++$.errors;
 	}
-	$.ehash.$msg = True;
+	$.ehash.($type + "-" + $msg) = True;
     }
 }

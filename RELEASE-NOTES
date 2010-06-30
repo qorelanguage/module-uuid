@@ -1,5 +1,14 @@
 ***********
-version 0.9
+version 1.1
+***********
+
+added the following static method allowing a string UUID to be returned immediately:
+static UUID::get(int $gen_flags = UUID::None, int $str_flags = UUID::None) returns string
+minor corrections were made in the documentation
+
+
+***********
+version 1.0
 ***********
 
 Initial release of the uuid module

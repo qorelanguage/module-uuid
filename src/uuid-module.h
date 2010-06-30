@@ -46,9 +46,37 @@ class QoreUUID : public AbstractPrivateData {
 protected:
    uuid_t uuid;
 
+   DLLLOCAL static QoreStringNode *getStringIntern(uuid_t uuid, int flags = QUF_NONE) {
+      QoreStringNode *str = new QoreStringNode;
+      str->allocate(37);
+
+#ifdef HAVE_UUID_UNPARSE_CASE
+      if (flags & QUF_UPPER_CASE)
+         uuid_unparse_upper(uuid, (char *)str->getBuffer());
+      else if (flags & QUF_LOWER_CASE)
+         uuid_unparse_lower(uuid, (char *)str->getBuffer());
+      else
+#endif
+         uuid_unparse(uuid, (char *)str->getBuffer());
+
+      str->terminate(36);
+      return str;
+   }
+
+   DLLLOCAL static void generateIntern(uuid_t uuid, int flags = QUF_NONE) {
+      if (flags & QUF_RANDOM)
+         uuid_generate_random(uuid);
+      else if (flags & QUF_TIME)
+         uuid_generate_time(uuid);
+      else if (flags & QUF_EMPTY)
+         uuid_clear(uuid);
+      else
+         uuid_generate(uuid);
+   }
+
 public:
-   DLLLOCAL QoreUUID(int flag = QUF_NONE) {
-      generate(flag);
+   DLLLOCAL QoreUUID(int flags = QUF_NONE) {
+      generateIntern(uuid, flags);
    }
 
    DLLLOCAL QoreUUID(const QoreString &uuid_str, ExceptionSink *xsink) {
@@ -59,19 +87,8 @@ public:
       uuid_copy(uuid, const_cast<QoreUUID &>(old).uuid);
    }
 
-   DLLLOCAL void generate(int flag = QUF_NONE) {
-      if (flag & QUF_RANDOM) {
-         uuid_generate_random(uuid);
-      }
-      else if (flag & QUF_TIME) {
-         uuid_generate_time(uuid);
-      }
-      else if (flag & QUF_EMPTY) {
-         uuid_clear(uuid);
-      }
-      else {
-         uuid_generate(uuid);
-      }
+   DLLLOCAL void generate(int flags = QUF_NONE) {
+      generateIntern(uuid, flags);
    }
 
    DLLLOCAL int set(const QoreString &uuid_str, ExceptionSink *xsink) {
@@ -89,21 +106,8 @@ public:
       return 0;
    }
 
-   DLLLOCAL QoreStringNode *toString(int flag = QUF_NONE) {
-      QoreStringNode *str = new QoreStringNode();
-      str->allocate(37);
-
-#ifdef HAVE_UUID_UNPARSE_CASE
-      if (flag & QUF_UPPER_CASE)
-         uuid_unparse_upper(uuid, (char *)str->getBuffer());
-      else if (flag & QUF_LOWER_CASE)
-         uuid_unparse_lower(uuid, (char *)str->getBuffer());
-      else
-#endif
-         uuid_unparse(uuid, (char *)str->getBuffer());
-
-      str->terminate(36);
-      return str;
+   DLLLOCAL QoreStringNode *toString(int flags = QUF_NONE) {
+      return getStringIntern(uuid, flags);
    }
 
    DLLLOCAL bool isNull() const {
@@ -116,6 +120,12 @@ public:
 
    DLLLOCAL int compare(const QoreUUID &other) {
       return uuid_compare(uuid, const_cast<QoreUUID &>(other).uuid);
+   }
+
+   DLLLOCAL static QoreStringNode *get(int gen_flags = QUF_NONE, int string_flags = QUF_NONE) {
+      uuid_t uuid;
+      generateIntern(uuid, gen_flags);
+      return getStringIntern(uuid, string_flags);
    }
 };
 
