@@ -673,14 +673,14 @@ to create a UUID with the null value:
 $uuid.generate(UUID::Empty);
 }}}</pre>
 </div>
-<div title="UUID::get()" creator="DavidNichols" modifier="DavidNichols" created="201006301043" modified="201006301051" changecount="4">
+<div title="UUID::get()" creator="DavidNichols" modifier="DavidNichols" created="201006301043" modified="201006301055" changecount="5">
 <pre>!Synopsis
 :Returns a UUID string without having to create a UUID object.  Note that the constants {{{LowerCase}}} and {{{UpperCase}}} only have an effect if the underlying uuid library supports this functionality; check the constant {{{UUID::HAVE_UNPARSE_CASE}}} first before relying on this functionality.
 !Prototype
-:* {{{static UUID::get(int $gen_flags = UUID::None, int $str_flags = UUID::None) returns string}}}
+:* {{{static UUID::get(int $str_flags = UUID::None, int $gen_flags = UUID::None) returns string}}}
 !Arguments
-:* {{{int $gen_flags}}}: [[UUID Generation Constants]] to affect how the UUID is generated
 :* {{{int $str_flags}}}: [[UUID String Formatting Constants]] to affect how the UUID string return value is formatted
+:* {{{int $gen_flags}}}: [[UUID Generation Constants]] to affect how the UUID is generated
 !Return Value
 :{{{string}}}: the string representation of the UUID, ex {{{&quot;f5c5fd74-5b3e-4f02-8772-f8a80da9b028&quot;}}}
 !Example:

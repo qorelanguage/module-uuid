@@ -99,7 +99,7 @@ static AbstractQoreNode *UUID_set(QoreObject *self, QoreUUID *uuid, const QoreLi
 }
 
 // static methods
-// static UUID::getString(int $gen_flags = UUID::None, int $string_flags = UUID::None) returns string
+// static UUID::get(int $str_flags = UUID::None, int $gen_flags = UUID::None) returns string
 static AbstractQoreNode *f_UUID_get(const QoreListNode *params, ExceptionSink *xsink) {
    return QoreUUID::get((int)HARD_QORE_INT(params, 0), (int)HARD_QORE_INT(params, 1));
 }
@@ -139,7 +139,7 @@ QoreStringNode *uuid_module_init() {
    QC_UUID->addMethodExtended("set", (q_method_t)UUID_set, false, QC_NO_FLAGS, QDOM_DEFAULT, nothingTypeInfo, 1, stringTypeInfo, QORE_PARAM_NO_ARG);
 
    // static methods
-   // static UUID::getString(int $gen_flags = UUID::None, int $string_flags = UUID::None) returns string
+   // static UUID::get(int $str_flags = UUID::None, int $gen_flags = UUID::None) returns string
    QC_UUID->addStaticMethodExtended("get", f_UUID_get, false, QC_RET_VALUE_ONLY, QDOM_DEFAULT, stringTypeInfo, 2, bigIntTypeInfo, new QoreBigIntNode(QUF_NONE), bigIntTypeInfo, new QoreBigIntNode(QUF_NONE));
 
    UNS.addSystemClass(QC_UUID);

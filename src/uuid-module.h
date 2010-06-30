@@ -122,7 +122,7 @@ public:
       return uuid_compare(uuid, const_cast<QoreUUID &>(other).uuid);
    }
 
-   DLLLOCAL static QoreStringNode *get(int gen_flags = QUF_NONE, int string_flags = QUF_NONE) {
+   DLLLOCAL static QoreStringNode *get(int string_flags = QUF_NONE, int gen_flags = QUF_NONE) {
       uuid_t uuid;
       generateIntern(uuid, gen_flags);
       return getStringIntern(uuid, string_flags);
