@@ -1,9 +1,23 @@
 ***********
+version 1.2
+***********
+
+took the following steps to ensure consistent behavior on all platforms:
+* modified the default output (without any flags) to always be a string with
+  lower-case hex digit letters
+* updated implementation to manage case even if the uuid library does not
+  support the uuid_unparse_lower() and uuid_unparse_upper() functions
+
+
+***********
 version 1.1
 ***********
 
-added the following static method allowing a string UUID to be returned immediately:
+added the following static method allowing a string UUID to be returned
+immediately:
+
 static UUID::get(int $gen_flags = UUID::None, int $str_flags = UUID::None) returns string
+
 minor corrections were made in the documentation
 
 

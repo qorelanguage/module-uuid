@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # AC_PREREQ(2.59)
-AC_INIT([qore-uuid-module], [1.1],
+AC_INIT([qore-uuid-module], [1.2],
         [David Nichols <david@qore.org>],
         [qore-uuid-module])
 AM_INIT_AUTOMAKE

@@ -34,7 +34,7 @@
 
 Summary: UUID module for Qore
 Name: qore-uuid-module
-Version: 1.1
+Version: 1.2
 Release: 1%{dist}
 License: LGPL
 Group: Development/Languages

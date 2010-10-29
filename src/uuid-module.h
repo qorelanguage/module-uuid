@@ -50,16 +50,24 @@ protected:
       QoreStringNode *str = new QoreStringNode;
       str->allocate(37);
 
+      if (flags == QUF_NONE)
+         flags = QUF_LOWER_CASE;
+
 #ifdef HAVE_UUID_UNPARSE_CASE
-      if (flags & QUF_UPPER_CASE)
-         uuid_unparse_upper(uuid, (char *)str->getBuffer());
-      else if (flags & QUF_LOWER_CASE)
+      if (flags & QUF_LOWER_CASE)
          uuid_unparse_lower(uuid, (char *)str->getBuffer());
       else
-#endif
-         uuid_unparse(uuid, (char *)str->getBuffer());
-
+         uuid_unparse_upper(uuid, (char *)str->getBuffer());
       str->terminate(36);
+#else
+      uuid_unparse(uuid, (char *)str->getBuffer());
+      str->terminate(36);
+      if (flags & QUF_UPPER_CASE)
+         str->toupr();
+      else
+         str->tolwr();
+#endif
+
       return str;
    }
 
