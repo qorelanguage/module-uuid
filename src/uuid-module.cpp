@@ -151,11 +151,7 @@ QoreStringNode *uuid_module_init() {
    UNS.addConstant("Time",      new QoreBigIntNode(QUF_TIME));
    UNS.addConstant("Empty",     new QoreBigIntNode(QUF_EMPTY));
 
-#ifdef HAVE_UUID_UNPARSE_CASE
    UNS.addConstant("HAVE_UNPARSE_CASE", &True);
-#else
-   UNS.addConstant("HAVE_UNPARSE_CASE", &False);
-#endif
 
    return 0;
 }

@@ -538,7 +538,7 @@ You can reach me at: mailto:david_nichols@users.sourceforge.net</pre>
 <pre>[[Introduction]]
 [[UUID Class]]</pre>
 </div>
-<div title="Introduction" modifier="DavidNichols" created="200808200719" modified="201006301047" changecount="79">
+<div title="Introduction" modifier="DavidNichols" created="200808200719" modified="201010290842" changecount="80">
 <pre>The uuid module provides the ability to generate and parse [[UUIDs|http://en.wikipedia.org/wiki/Universally_Unique_Identifier]] (Universally Unique Identifiers).
 
 This module is released under the [[LGPL 2.1|http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html]] and is tagged as such in the module's header (meaning it can be loaded unconditionally regardless of how the Qore library was initialized).
@@ -547,14 +547,16 @@ Note that this documentation is based on [[TiddlyWiki|http://www.tiddlywiki.com]
 
 Like all Qore components, the uuid module is thread-safe.
 
-This module provides the [[UUID Class]], [[UUID Generation Constants]], [[UUID String Formatting Constants]], and one additional constant: {{{HAVE_UNPARSE_CASE}}}, which tells if the underlying uuid library support controlling the case of UUID strings (the use of constants {{{LowerCase}}} and {{{UpperCase}}} with [[UUID::toString()]]).
+This module provides the [[UUID Class]], [[UUID Generation Constants]], and [[UUID String Formatting Constants]].
 
 Note that the [[UUID Class]] and all constants are provided in the {{{UUID}}} namespace.
 
 To simply get a UUID string without creating a UUID object, call static method [[UUID::get()]] as follows:
 {{{
 my string $uuid = UUID::get();
-}}}</pre>
+}}}
+
+Note that the constant: {{{HAVE_UNPARSE_CASE}}} in this version is always {{{True}}}, as the module now manages the case of letters in generated UUID strings even if the underlying uuid library does not.  By default lower-case letters are generated if no option is specified to make the behavior of the module consistent on all platforms and with all underlying uuid libraries.</pre>
 </div>
 <div title="MainMenu" modifier="DavidNichols" created="200808200730" modified="201006291133" changecount="39">
 <pre>[[Introduction]]
@@ -591,15 +593,15 @@ my string $uuid = UUID::get();
 |{{{Time}}}|Force the use of the alternative algorithm that uses the current time and local ethernet MAC address (if available); note that this algorithm can leak information about when and where  the UUID was generated|
 |{{{Empty}}}|The UUID will be assigned the null value on creation|</pre>
 </div>
-<div title="UUID String Formatting Constants" creator="DavidNichols" modifier="DavidNichols" created="201006291116" modified="201006291354" changecount="2">
+<div title="UUID String Formatting Constants" creator="DavidNichols" modifier="DavidNichols" created="201006291116" modified="201010290844" changecount="4">
 <pre>UUID string generation constants affect how strings are created from UUID objects.  All UUID string generation constants are integers.
 
-Note that the constants {{{LowerCase}}} and {{{UpperCase}}} only have an effect if the underlying uuid library supports this functionality; check the constant {{{UUID::HAVE_UNPARSE_CASE}}} first before relying on this functionality.
+Note that {{{LowerCase}}} is the default, {{{None}}} is included for backwards-compatibility.
 
 |!Constant|!Description|h
-|{{{None}}}|No value; this is the default|
+|{{{None}}}|In this version of the uuid module this is equivalent to {{{LowerCase}}}|
 |{{{UpperCase}}}|All hexadecimal characters will be in upper case|
-|{{{LowerCase}}}|All hexadecimal characters will be in lower case|</pre>
+|{{{LowerCase}}}|All hexadecimal characters will be in lower case; this is the default|</pre>
 </div>
 <div title="UUID::clear()" creator="DavidNichols" modifier="DavidNichols" created="201006291122" modified="201006301049" changecount="4">
 <pre>!Synopsis
