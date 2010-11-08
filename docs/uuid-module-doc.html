@@ -570,7 +570,7 @@ Note that the constant: {{{HAVE_UNPARSE_CASE}}} in this version is always {{{Tru
 <div title="SiteTitle" modifier="DavidNichols" created="200808200717" modified="201006290822" changecount="30">
 <pre>Qore uuid Module Documentation</pre>
 </div>
-<div title="UUID Class" creator="DavidNichols" modifier="DavidNichols" created="201006291059" modified="201006301047" changecount="14">
+<div title="UUID Class" creator="DavidNichols" modifier="DavidNichols" created="201006291059" modified="201010290848" changecount="15">
 <pre>The UUID class provides methods that allow ~UUIDs to be created, manipulated, and parsed.
 
 |!Method|!Description|h
@@ -581,7 +581,7 @@ Note that the constant: {{{HAVE_UNPARSE_CASE}}} in this version is always {{{Tru
 |[[UUID::generate(int $flags = UUID::None) returns nothing|UUID::generate()]]|generates a new UUID for the object|
 |[[UUID::isNull() returns bool|UUID::isNull()]]|returns True if the current UUID is the null UUID, or False if not|
 |[[UUID::toString(int $flags = UUID::None) returns string|UUID::toString()]]|returns the string representation of the UUID|
-|[[static UUID::get(int $gen_flags = UUID::None, int $str_flags = UUID::None) returns string|UUID::get()]]|returns a UUID string without having to create a UUID object|
+|[[static UUID::get(int $str_flags = UUID::None, int $gen_flags = UUID::None) returns string|UUID::get()]]|returns a UUID string without having to create a UUID object|
 </pre>
 </div>
 <div title="UUID Generation Constants" creator="DavidNichols" modifier="DavidNichols" created="201006291115" modified="201006291118" changecount="3">
