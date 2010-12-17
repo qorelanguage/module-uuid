@@ -22,7 +22,7 @@ to configure the build, execute
 if the qore library cannot be found, then you can use:
    	configure --disable-debug --with-qore=<dir>
 
-if libyaml cannot be found, then you can use:
+if libuuid cannot be found, then you can use:
    	configure --disable-debug --with-libuuid=<dir>
 
 The qore binary also needs to be in the path so configure can determine the module directory
