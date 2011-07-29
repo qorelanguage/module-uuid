@@ -93,6 +93,35 @@ case "${host_os}" in
 		fi
 		AC_DEFINE(HPUX, 1, if compiling on HP-UX)
 		;;
+     *cygwin*)  SHLIB_SUFFIX=dll
+     		CPPFLAGS=-mwin32
+		windows=yes
+     		;;
+     *mingw32*) SHLIB_SUFFIX=dll
+     		windows=yes
+		mingw=yes
+		#CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0501"
+		#LDFLAGS="$LDFLAGS -lwsock32 -lws2_32 -lgdi32 -liconv"
+		#make_dll=yes
+		CPPFLAGS="$CPPFLAGS -DBUILDING_DLL=1"
+		MODULE_LDFLAGS="-no-undefined"
+		OS=Windows
+		# set LIB_PREFIX if not already set
+		if test -z "$LIB_PREFIX"; then
+   		   AC_MSG_CHECKING([for mingw32 library prefix])
+		   cc_loc=`which $CXX|head -1`
+		   mingw_base=`dirname $cc_loc|sed 's/\/@<:@^/@:>@*$//'`
+		   cc_targ=`echo $CXX|sed s/-g++$//`
+		   if test -d $mingw_base/$cc_targ; then
+		      LIB_PREFIX=$mingw_base/$cc_targ
+		      AC_MSG_RESULT([$LIB_PREFIX])
+		   else
+		      AC_MSG_RESULT([not found])
+		   fi
+		fi
+		;;
+     *)         AC_WARN(Unknown platform ${host_os})
+                ;;
 esac
 AC_SUBST(SHLIB_SUFFIX)
 if test -z "$MODULE_SUFFIX" ; then
@@ -229,6 +258,13 @@ fi
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 #LDFLAGS="$LDFLAGS $PTHREAD_LIBS"
 
+# allow the user to set a generic search prefix for libraries, includes, etc
+AC_ARG_WITH([lib-prefix],
+  [AS_HELP_STRING([--with-lib-prefix@<:@=DIR@:>@],
+                  [generic search prefix for libraries, includes, etc])],
+  [if test ! -d "${with_lib_prefix}"; then AC_MSG_ERROR([bad value ${with_lib_prefix} for --with-lib-prefix]); unset with_lib_prefix; fi],
+  [with_lib_prefix="$LIB_PREFIX"])
+
 AC_ARG_ENABLE([single-compilation-unit],
   [AS_HELP_STRING([--enable-single-compilation-unit],
                   [enable compilation as a single unit (default: on)])],
@@ -241,7 +277,8 @@ AC_ARG_ENABLE([single-compilation-unit],
 AC_ARG_WITH([libuuid],
     [AS_HELP_STRING([--with-libuuid@<:@=DIR@:>@],
                     [libuuid base directory])],
-    [if test ! -d "${with_libuuid}"; then AC_MSG_ERROR(directory ${with_libuuid} does not exist for --with-libuuid); unset with_libuuid; fi])
+    [if test ! -d "${with_libuuid}"; then AC_MSG_ERROR(directory ${with_libuuid} does not exist for --with-libuuid); unset with_libuuid; fi],
+    [with_libuuid=$UUID_DIR])
 
 check_uuid() {
     inc="$1/include"
@@ -294,22 +331,22 @@ check_uuid() {
 }
 
 # see if we can figure out where the uuid include files and libraries are
-if test "${with_uuid}" != "no"; then
+if test "${with_libuuid}" != "no"; then
    AC_MSG_CHECKING([for libuuid includes and libraries])
 
-   if test -n "$with_uuid"; then
-      check_uuid "$with_uuid"
+   if test -n "$with_libuuid"; then
+      check_uuid "$with_libuuid"
       if test -z "$with_uuid_includes"; then
-	 AC_MSG_ERROR([not found in $with_uuid])
-      fi
+	 AC_MSG_ERROR([not found in $with_libuuid])
+      fi      
+   else
+      for dir in "${with_lib_prefix}" "${find_prefix}" / /usr /usr/local /opt/uuid /usr/uuid /sw /opt/local /opt/sfw /usr/sfw /opt/gnu; do
+         check_uuid $dir
+      	 if test -n "$with_uuid_includes"; then
+	    break;
+         fi
+      done
    fi
-
-   for dir in $UUID_DIR / /usr /usr/local /opt/uuid /usr/uuid /sw /opt/local /opt/sfw /usr/sfw /opt/gnu; do
-      check_uuid $dir
-      if test -n "$with_uuid_includes"; then
-	 break;
-      fi
-   done
 
    if test -n "$with_uuid_includes"; then
       if test -n "$uuid_static"; then
@@ -326,48 +363,59 @@ else
 fi
 
 if test "${with_uuid}" = yes; then
-  if test -n "$with_uuid_includes"; then
-     # only set include path if necessary
-     if test -n "$uuid_app_includes"; then
-          UUID_INCLUDES="-I$with_uuid_includes"
-     fi
-     if test -n "$uuid_static"; then
-          UUID_LIBS="$with_uuid_libs/libuuid.a"
-     else
-	if test -n "$uuid_app_libs"; then
-	   UUID_LIBS="-L$with_uuid_libs -luuid"
+    # only set include path if necessary
+    if test -n "$uuid_app_includes"; then
+        UUID_CPPFLAGS="-I$with_uuid_includes"
+    fi
+    if test -n "$uuid_static"; then
+        UUID_LIBS="$with_uuid_libs/libuuid.a"
+    else
+        if test -n "$uuid_app_libs"; then
+	    UUID_LIBS="-L$with_uuid_libs -luuid"
 	elif test "$with_uuid_libs" != "System"; then
-	   UUID_LIBS="-luuid"
+	    UUID_LIBS="-luuid"
 	fi
-     fi
+    fi
 
-     # check for uuid_string_t
-     #AC_MSG_CHECKING([for uuid_strint_t in uuid.h])
-     #if test -n "`grep uuid_strint_t $with_uuid_includes/uuid.h`"; then
-     #	AC_DEFINE(HAS_UUID_STRING_T, 1, [if uuid.h uses uuid_string_t])
-     #	AC_MSG_RESULT([yes])
-     #else
-     #   AC_MSG_RESULT([no])
-     #fi
+    # check for uuid_string_t
+    #AC_MSG_CHECKING([for uuid_strint_t in uuid.h])
+    #if test -n "`grep uuid_strint_t $with_uuid_includes/uuid.h`"; then
+    #	AC_DEFINE(HAS_UUID_STRING_T, 1, [if uuid.h uses uuid_string_t])
+    #	AC_MSG_RESULT([yes])
+    #else
+    #   AC_MSG_RESULT([no])
+    #fi
 
-     # check for uuid_unparse_upper() and uuid_unparse_lower()
-     AC_MSG_CHECKING([for uuid_unparse_upper() and uuid_unparse_lower()])
-     uuid_ul="`grep -e uuid_unparse_upper -e uuid_unparse_lower $with_uuid_includes/uuid.h 2>/dev/null`"
-     if test -n "$uuid_ul"; then
-     	AC_DEFINE(HAS_UUID_UNPARSE_CASE, 1, [if uuid_unparse_lower() and uuid_unparse_upper() are available])
+    # check for uuid_unparse_upper() and uuid_unparse_lower()
+    AC_MSG_CHECKING([for uuid_unparse_upper() and uuid_unparse_lower()])
+    uuid_ul="`grep -e uuid_unparse_upper -e uuid_unparse_lower $with_uuid_includes/uuid.h 2>/dev/null`"
+    if test -n "$uuid_ul"; then
+    	AC_DEFINE(HAS_UUID_UNPARSE_CASE, 1, [if uuid_unparse_lower() and uuid_unparse_upper() are available])
  	AC_MSG_RESULT([yes])
-     else
-	AC_MSG_RESULT([no])
-     fi
+    else
+        AC_MSG_RESULT([no])
+    fi
 
-     # check if C++ compiler can link with UUID libs
-     SAVE_CXXFLAGS="$CXXFLAGS"
-     SAVE_LDFLAGS="$LDFLAGS"
-     CXXFLAGS="$CXXFLAGS $UUID_INCLUDES"
-     LDFLAGS="$LDFLAGS $UUID_LIBS"
-     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    # check if C++ compiler can link with UUID libs
+    SAVE_CXXFLAGS="$CXXFLAGS"
+    SAVE_LDFLAGS="$LDFLAGS"
+    CXXFLAGS="$CXXFLAGS $UUID_CPPFLAGS"
+    LDFLAGS="$LDFLAGS $UUID_LIBS"
+
+    # see if it's OSSP UUID
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <uuid.h>
-	 ]],[[
+	]],[[
+uuid_t *up; uuid_create(&up);
+	]])], ossp_uuid=yes, ossp_uuid=no)
+
+    if test "$ossp_uuid" = yes; then
+        UUID_CPPFLAGS="$UUID_CPPFLAGS -DOSSP_UUID=1"
+    else
+        # check for UNIX/Ted Ts'o's UUID library
+        AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <uuid.h>
+	]],[[
 #ifndef _UUID_STRING_t
 typedef char* uuid_string_t;
 #endif
@@ -376,19 +424,18 @@ uuid_t uu;
 uuid_parse(in, uu);
 	]])], uuid_links=yes, uuid_links=no)
 
-     CXXFLAGS="$SAVE_CXXFLAGS"
-     LDFLAGS="$SAVE_LDFLAGS"
+        CXXFLAGS="$SAVE_CXXFLAGS"
+        LDFLAGS="$SAVE_LDFLAGS"
 
-     if test "$uuid_links" = "no"; then
-        AC_MSG_ERROR([could not compile a test libuuid program])
-     else
-        AC_SUBST(UUID_INCLUDES)
-	AC_SUBST(UUID_LIBS)
-        with_uuid=yes
-     fi
-  else
-     AC_MSG_ERROR([no libuuid libraries or includes found])
-  fi
+        if test "$uuid_links" = "no"; then
+            AC_MSG_ERROR([could not compile a test libuuid program])
+        fi
+    fi
+    AC_SUBST(UUID_CPPFLAGS)
+    AC_SUBST(UUID_LIBS)
+    with_uuid=yes
+else
+    AC_MSG_ERROR([no libuuid libraries or includes found])
 fi
 
 set_qore_cppflags() {
@@ -409,6 +456,12 @@ find_qore() {
         fi
     else
         if test -f "$lib/libqore.${SHLIB_SUFFIX}"; then
+            if test "$lib" != "/lib" -a "$lib" != "/usr/lib"; then
+                QORE_LDFLAGS="-L$lib"
+            fi
+            QORE_LDFLAGS="$QORE_LDFLAGS -lqore"
+            AC_MSG_RESULT([$lib (shared)])
+        elif test "$mingw" = yes -a -f "$lib/libqore.${SHLIB_SUFFIX}.a"; then
             if test "$lib" != "/lib" -a "$lib" != "/usr/lib"; then
                 QORE_LDFLAGS="-L$lib"
             fi
@@ -452,7 +505,7 @@ AC_ARG_WITH([qore-dir],
   [with_qore_dir="$QORE_DIR"])
 
 AC_MSG_CHECKING([for qore libraries and header files])
-for dir in "${with_qore_dir}" "${find_prefix} "/usr / /usr/local /opt/gnu /opt/qore /usr/local/qore /opt/local /sw /usr/sfw /opt/sfw; do
+for dir in "${with_qore_dir}" "${with_lib_prefix}" "${find_prefix}" /usr / /usr/local /opt/gnu /opt/qore /usr/local/qore /opt/local /sw /usr/sfw /opt/sfw; do
     find_qore $dir
     if test -n "$QORE_LDFLAGS"; then
         break
@@ -625,6 +678,12 @@ fi
 
 AC_SUBST(OTHER_LIBS)
 
+# if compiling for mingw32, we have to add qore ldflags to the module's ldflags
+if test "$mingw" = yes; then
+    MODULE_LDFLAGS="$MODULE_LDFLAGS $QORE_LDFLAGS"
+    AC_SUBST(MODULE_LDFLAGS)
+fi
+
 # save more version information in config.h
 MODULE_VERSION_MAJOR=`echo $PACKAGE_VERSION | cut -f3 -d\  | sed s/\"//g | cut -f1 -d.`
 MODULE_VERSION_MINOR=`echo $PACKAGE_VERSION | cut -f3 -d\  | sed s/\"//g | cut -f2 -d.`
@@ -654,8 +713,7 @@ else
    printf " (32-bit)\n"
 fi
 
-show_library_feature()
-{
+show_library_feature() {
    printf "%-24s: " "$1"
    if test "$2" = "yes"; then
       printf "%-8s" yes
@@ -671,3 +729,20 @@ show_library_feature()
 show_library_feature optimizations $enable_optimization
 show_library_feature debug $enable_debug
 show_library_feature profiling $enable_profile
+
+# hack to use our libtool if on HP-UX and mingw to enable static libs to be linked in to modules
+# on HP-UX, also to allow 64-bit libraries to be linked to modules
+if test "$OS" = "HP-UX" -o "$mingw" = yes; then
+   # backup generated libtool
+   if test ! -e libtool.orig ; then
+      cp libtool libtool.orig
+   fi
+   # remove references to -ldl in libtool
+   sed "s/-ldl//g" libtool > libtool.tmp
+   # ensure static libs can be linked to modules
+   sed "s/valid_a_lib=no/valid_a_lib=yes/g" libtool.tmp > libtool.tmp.1
+   # ensure static libs can be linked to modules and ensure that valid 64-bit libraries are not recognized as invalid
+   sed "s/deplibs_check_method=.*/deplibs_check_method=pass_all/g" libtool.tmp.1 > libtool
+   # delete temporary files
+   rm -f libtool.tmp libtool.tmp.1
+fi

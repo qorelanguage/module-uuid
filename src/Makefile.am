@@ -1,3 +1,5 @@
+MNAME=uuid
+
 if COND_SINGLE_COMPILATION_UNIT
 UUID_SOURCES = single-compilation-unit.cpp
 else
@@ -6,11 +8,11 @@ endif
 
 lib_LTLIBRARIES = uuid.la
 uuid_la_SOURCES = $(UUID_SOURCES)
-uuid_la_LDFLAGS = -module -avoid-version ${UUID_LIBS}
+uuid_la_LDFLAGS = -module -avoid-version ${UUID_LIBS} ${MODULE_LDFLAGS}
 
-INCLUDES = -I$(top_srcdir)/include $(UUID_INCLUDES)
+INCLUDES = -I$(top_srcdir)/include
 
-AM_CPPFLAGS=$(QORE_CPPFLAGS)
+AM_CPPFLAGS=$(QORE_CPPFLAGS) $(UUID_CPPFLAGS)
 
 if COND_PROFILE
 AM_CXXFLAGS=-g -pg
@@ -21,5 +23,5 @@ endif
 endif
 
 install-exec-hook:
-	mv $(DESTDIR)$(libdir)/uuid.$(MODULE_SUFFIX) $(DESTDIR)$(libdir)/uuid-api-$(MODULE_API).qmod
-	rm -f $(DESTDIR)$(libdir)/uuid.la
+	mv $(DESTDIR)$(libdir)/$(MNAME).$(MODULE_SUFFIX) $(DESTDIR)$(libdir)/$(MNAME)-api-$(MODULE_API).qmod
+	$(RM) $(DESTDIR)$(libdir)/$(MNAME).la $(DESTDIR)$(libdir)/$(MNAME).dll.a

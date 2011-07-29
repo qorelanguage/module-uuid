@@ -6,8 +6,7 @@ The Qore uuid module provides the ability to generate and parse UUIDs, Universal
 For more information about UUIDs, see:
     	http://en.wikipedia.org/wiki/Universally_Unique_Identifier
 
-Basically this module provides a Qore-language API to libuuid
-	http://www.ossp.org/pkg/lib/uuid/
+Basically this module provides a Qore-language API to libuuid on UNIX systems
 
 see docs for more information
 
