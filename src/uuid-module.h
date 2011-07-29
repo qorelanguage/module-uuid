@@ -48,32 +48,36 @@ typedef uuid_t* q_uuid_t;
 typedef uuid_t q_uuid_t;
 #endif
 
-#define Q_UUID_LEN 37
+#define Q_UUID_LEN 36
 
 class QoreUUID : public AbstractPrivateData {
 protected:
    q_uuid_t uuid;
 
    DLLLOCAL static QoreStringNode *getStringIntern(q_uuid_t uuid, int flags = QUF_NONE) {
-      QoreStringNode *str = new QoreStringNode;
-      str->allocate(Q_UUID_LEN + 1);
-
       if (flags == QUF_NONE)
          flags = QUF_LOWER_CASE;
 
 #ifdef OSSP_UUID
-      size_t len = Q_UUID_LEN;
+      size_t len = 0;
 #ifdef DEBUG
-      uuid_rc_t rc = uuid_export(uuid, UUID_FMT_STR, (char *)str->getBuffer(), &len);
+      char *buf = 0;
+      uuid_rc_t rc = uuid_export(uuid, UUID_FMT_STR, &buf, &len);
+      if (rc != UUID_RC_OK)
+         printd(0, "uuid_export error: %d: %s\n", rc, uuid_error(rc));
       assert(rc == UUID_RC_OK);
 #else
-      uuid_export(uuid, UUID_FMT_STR, (char *)str->getBuffer(), &len);
+      uuid_export(uuid, UUID_FMT_STR, &buf, &len);
 #endif
+      QoreStringNode *str = new QoreStringNode(buf, len, len + 1, QCS_DEFAULT);
       if (flags & QUF_UPPER_CASE)
          str->toupr();
       else
          str->tolwr();
 #else // OSSP_UUID
+      QoreStringNode *str = new QoreStringNode;
+      str->allocate(Q_UUID_LEN + 1);
+
 #ifdef HAVE_UUID_UNPARSE_CASE
       if (flags & QUF_LOWER_CASE)
          uuid_unparse_lower(uuid, (char *)str->getBuffer());
@@ -209,6 +213,9 @@ public:
 
    DLLLOCAL static QoreStringNode *get(int string_flags = QUF_NONE, int gen_flags = QUF_NONE) {
       q_uuid_t uuid;
+#ifdef OSSP_UUID
+      uuid_create(&uuid);
+#endif
       generateIntern(uuid, gen_flags);
       return getStringIntern(uuid, string_flags);
    }
