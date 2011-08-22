@@ -334,108 +334,126 @@ check_uuid() {
 if test "${with_libuuid}" != "no"; then
    AC_MSG_CHECKING([for libuuid includes and libraries])
 
-   if test -n "$with_libuuid"; then
-      check_uuid "$with_libuuid"
-      if test -z "$with_uuid_includes"; then
-	 AC_MSG_ERROR([not found in $with_libuuid])
-      fi      
-   else
-      for dir in "${with_lib_prefix}" "${find_prefix}" / /usr /usr/local /opt/uuid /usr/uuid /sw /opt/local /opt/sfw /usr/sfw /opt/gnu; do
-         check_uuid $dir
-      	 if test -n "$with_uuid_includes"; then
-	    break;
-         fi
-      done
-   fi
-
-   if test -n "$with_uuid_includes"; then
-      if test -n "$uuid_static"; then
-	 AC_MSG_RESULT([includes=$with_uuid_includes, libs=$with_uuid_libs (static)])
-      else
-	 AC_MSG_RESULT([includes=$with_uuid_includes, libs=$with_uuid_libs (shared)])
-      fi
+   if test "$windows" = yes; then
+      AC_MSG_RESULT([using windows uuid support])
+      UUID_LIBS="-lrpcrt4"
       with_uuid=yes
    else
-      AC_MSG_ERROR([not found])
+      if test -n "$with_libuuid"; then
+         check_uuid "$with_libuuid"
+      	 if test -z "$with_uuid_includes"; then
+	    AC_MSG_ERROR([not found in $with_libuuid])
+      	 fi      
+      else
+	 for dir in "${with_lib_prefix}" "${find_prefix}" / /usr /usr/local /opt/uuid /usr/uuid /sw /opt/local /opt/sfw /usr/sfw /opt/gnu; do
+            check_uuid $dir
+      	    if test -n "$with_uuid_includes"; then
+	       break;
+            fi
+      	 done
+      fi
+   
+      if test -n "$with_uuid_includes"; then
+         if test -n "$uuid_static"; then
+	    AC_MSG_RESULT([includes=$with_uuid_includes, libs=$with_uuid_libs (static)])
+         else
+	    AC_MSG_RESULT([includes=$with_uuid_includes, libs=$with_uuid_libs (shared)])
+         fi
+         with_uuid=yes
+      else
+         AC_MSG_ERROR([not found])
+      fi
    fi
 else
    AC_MSG_ERROR([cannot build module without libuuid support])
 fi
 
 if test "${with_uuid}" = yes; then
-    # only set include path if necessary
-    if test -n "$uuid_app_includes"; then
-        UUID_CPPFLAGS="-I$with_uuid_includes"
-    fi
-    if test -n "$uuid_static"; then
-        UUID_LIBS="$with_uuid_libs/libuuid.a"
+    if test "$windows" = yes; then
+       # check if C++ compiler can link with UUID libs
+       SAVE_CXXFLAGS="$CXXFLAGS"
+       SAVE_LDFLAGS="$LDFLAGS"
+       CXXFLAGS="$CXXFLAGS $UUID_CPPFLAGS"
+       LDFLAGS="$LDFLAGS $UUID_LIBS"
+
+       # see if the windows UUID support is available
+       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#include <windows.h>
+   	   ]],[[
+UUID uuid; UuidCreate(&uuid);
+	   ]])], win_uuid=yes, win_uuid=no)
+
+       if test "$win_uuid" = "no"; then
+          AC_MSG_ERROR([failed to compile a test program with the Windows UUID API])
+       fi
+       AC_SUBST(UUID_LIBS)
+       with_uuid=yes
     else
-        if test -n "$uuid_app_libs"; then
-	    UUID_LIBS="-L$with_uuid_libs -luuid"
-	elif test "$with_uuid_libs" != "System"; then
-	    UUID_LIBS="-luuid"
-	fi
-    fi
+       # only set include path if necessary
+       if test -n "$uuid_app_includes"; then
+          UUID_CPPFLAGS="-I$with_uuid_includes"
+       fi
+       if test -n "$uuid_static"; then
+          UUID_LIBS="$with_uuid_libs/libuuid.a"
+       else
+          if test -n "$uuid_app_libs"; then
+	     UUID_LIBS="-L$with_uuid_libs -luuid"
+	  elif test "$with_uuid_libs" != "System"; then
+	     UUID_LIBS="-luuid"
+	  fi
+       fi
 
-    # check for uuid_string_t
-    #AC_MSG_CHECKING([for uuid_strint_t in uuid.h])
-    #if test -n "`grep uuid_strint_t $with_uuid_includes/uuid.h`"; then
-    #	AC_DEFINE(HAS_UUID_STRING_T, 1, [if uuid.h uses uuid_string_t])
-    #	AC_MSG_RESULT([yes])
-    #else
-    #   AC_MSG_RESULT([no])
-    #fi
+       # check for uuid_unparse_upper() and uuid_unparse_lower()
+       AC_MSG_CHECKING([for uuid_unparse_upper() and uuid_unparse_lower()])
+       uuid_ul="`grep -e uuid_unparse_upper -e uuid_unparse_lower $with_uuid_includes/uuid.h 2>/dev/null`"
+       if test -n "$uuid_ul"; then
+    	  AC_DEFINE(HAS_UUID_UNPARSE_CASE, 1, [if uuid_unparse_lower() and uuid_unparse_upper() are available])
+ 	  AC_MSG_RESULT([yes])
+       else
+          AC_MSG_RESULT([no])
+       fi
 
-    # check for uuid_unparse_upper() and uuid_unparse_lower()
-    AC_MSG_CHECKING([for uuid_unparse_upper() and uuid_unparse_lower()])
-    uuid_ul="`grep -e uuid_unparse_upper -e uuid_unparse_lower $with_uuid_includes/uuid.h 2>/dev/null`"
-    if test -n "$uuid_ul"; then
-    	AC_DEFINE(HAS_UUID_UNPARSE_CASE, 1, [if uuid_unparse_lower() and uuid_unparse_upper() are available])
- 	AC_MSG_RESULT([yes])
-    else
-        AC_MSG_RESULT([no])
-    fi
+       # check if C++ compiler can link with UUID libs
+       SAVE_CXXFLAGS="$CXXFLAGS"
+       SAVE_LDFLAGS="$LDFLAGS"
+       CXXFLAGS="$CXXFLAGS $UUID_CPPFLAGS"
+       LDFLAGS="$LDFLAGS $UUID_LIBS"
 
-    # check if C++ compiler can link with UUID libs
-    SAVE_CXXFLAGS="$CXXFLAGS"
-    SAVE_LDFLAGS="$LDFLAGS"
-    CXXFLAGS="$CXXFLAGS $UUID_CPPFLAGS"
-    LDFLAGS="$LDFLAGS $UUID_LIBS"
-
-    # see if it's OSSP UUID
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+       # see if it's OSSP UUID
+       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <uuid.h>
-	]],[[
+   	   ]],[[
 uuid_t *up; uuid_create(&up);
-	]])], ossp_uuid=yes, ossp_uuid=no)
+	   ]])], ossp_uuid=yes, ossp_uuid=no)
 
-    if test "$ossp_uuid" = yes; then
-        UUID_CPPFLAGS="$UUID_CPPFLAGS -DOSSP_UUID=1"
-    else
-        # check for UNIX/Ted Ts'o's UUID library
-        AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+       if test "$ossp_uuid" = yes; then
+          UUID_CPPFLAGS="$UUID_CPPFLAGS -DOSSP_UUID=1"
+       else
+          # check for UNIX/Ted Ts'o's UUID library
+          AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <uuid.h>
-	]],[[
+	  ]],[[
 #ifndef _UUID_STRING_t
 typedef char* uuid_string_t;
 #endif
 uuid_string_t in;
 uuid_t uu;
 uuid_parse(in, uu);
-	]])], uuid_links=yes, uuid_links=no)
+	  ]])], uuid_links=yes, uuid_links=no)
 
-        CXXFLAGS="$SAVE_CXXFLAGS"
-        LDFLAGS="$SAVE_LDFLAGS"
+          CXXFLAGS="$SAVE_CXXFLAGS"
+          LDFLAGS="$SAVE_LDFLAGS"
 
-        if test "$uuid_links" = "no"; then
-            AC_MSG_ERROR([could not compile a test libuuid program])
-        fi
-    fi
-    AC_SUBST(UUID_CPPFLAGS)
-    AC_SUBST(UUID_LIBS)
-    with_uuid=yes
+          if test "$uuid_links" = "no"; then
+             AC_MSG_ERROR([could not compile a test libuuid program])
+          fi
+       fi
+       AC_SUBST(UUID_CPPFLAGS)
+       AC_SUBST(UUID_LIBS)
+       with_uuid=yes
+   fi
 else
-    AC_MSG_ERROR([no libuuid libraries or includes found])
+   AC_MSG_ERROR([no libuuid libraries or includes found])
 fi
 
 set_qore_cppflags() {

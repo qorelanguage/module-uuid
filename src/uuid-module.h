@@ -4,7 +4,7 @@
   
   Qore Programming Language
 
-  Copyright 2010 David Nichols
+  Copyright 2010 - 2011 David Nichols
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,11 @@
 
 #include <qore/Qore.h>
 
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#define WIN_UUID 1
+#else
 #include <uuid.h>
+#endif
 
 #ifndef _UUID_STRING_T
 typedef char* uuid_string_t;
@@ -42,10 +46,14 @@ typedef char* uuid_string_t;
 #define QUF_TIME        4
 #define QUF_EMPTY       5
 
+#ifdef WIN_UUID
+typedef UUID q_uuid_t;
+#else
 #ifdef OSSP_UUID
 typedef uuid_t* q_uuid_t;
 #else
 typedef uuid_t q_uuid_t;
+#endif
 #endif
 
 #define Q_UUID_LEN 36
@@ -54,10 +62,26 @@ class QoreUUID : public AbstractPrivateData {
 protected:
    q_uuid_t uuid;
 
-   DLLLOCAL static QoreStringNode *getStringIntern(q_uuid_t uuid, int flags = QUF_NONE) {
+   DLLLOCAL static QoreStringNode *getStringIntern(q_uuid_t &uuid, int flags = QUF_NONE) {
       if (flags == QUF_NONE)
          flags = QUF_LOWER_CASE;
 
+#ifdef WIN_UUID
+      UCHAR *StringUuid = 0;
+#ifdef DEBUG
+      RPC_STATUS rc =
+#endif
+      UuidToString(&uuid, &StringUuid);
+#ifdef DEBUG
+      assert(rc == RPC_S_OK);
+#endif
+      QoreStringNode *str = new QoreStringNode((const char *)StringUuid);
+      RpcStringFree(&StringUuid);
+      if (flags & QUF_UPPER_CASE)
+         str->toupr();
+      else
+         str->tolwr();
+#else // WIN_UUID
 #ifdef OSSP_UUID
       size_t len = 0;
 #ifdef DEBUG
@@ -66,9 +90,9 @@ protected:
       if (rc != UUID_RC_OK)
          printd(0, "uuid_export error: %d: %s\n", rc, uuid_error(rc));
       assert(rc == UUID_RC_OK);
-#else
+#else // !DEBUG
       uuid_export(uuid, UUID_FMT_STR, &buf, &len);
-#endif
+#endif // DEBUG
       QoreStringNode *str = new QoreStringNode(buf, len, len + 1, QCS_DEFAULT);
       if (flags & QUF_UPPER_CASE)
          str->toupr();
@@ -91,13 +115,17 @@ protected:
          str->toupr();
       else
          str->tolwr();
-#endif
+#endif // HAVE_UUID_UNPARSE_CASE
 #endif // OSSP_UUID
+#endif // WIN_UUID
 
       return str;
    }
 
-   DLLLOCAL static void generateIntern(q_uuid_t uuid, int flags = QUF_NONE) {
+   DLLLOCAL static void generateIntern(q_uuid_t &uuid, int flags = QUF_NONE) {
+#ifdef WIN_UUID
+      UuidCreate(&uuid);
+#else
 #ifdef OSSP_UUID
       if (flags & QUF_TIME)
          uuid_make(uuid, UUID_MAKE_V1);
@@ -112,6 +140,7 @@ protected:
          uuid_clear(uuid);
       else
          uuid_generate(uuid);
+#endif
 #endif
    }
 
@@ -131,11 +160,16 @@ public:
    }
 
    DLLLOCAL QoreUUID(const QoreUUID &old) {
+#ifdef WIN_UUID
+      // FIXME: test
+      memcpy(&uuid, &old.uuid, sizeof(UUID));
+#else
 #ifdef OSSP_UUID
       uuid_create(&uuid);
       uuid_clone(old.uuid, &uuid);
 #else
       uuid_copy(uuid, const_cast<QoreUUID &>(old).uuid);
+#endif
 #endif
    }
 
@@ -162,6 +196,14 @@ public:
    }
 
    DLLLOCAL int set(const QoreString &uuid_str, ExceptionSink *xsink) {
+#ifdef WIN_UUID
+      RPC_STATUS rc = UuidFromString((unsigned char *)uuid_str.getBuffer(), &uuid);
+      if (rc == RPC_S_OK)
+         return 0;
+
+      xsink->raiseException("UUID-CONSTRUCTOR-ERROR", getErrorString(xsink, uuid_str));
+      return -1;
+#else
 #ifdef OSSP_UUID
       uuid_rc_t rc = uuid_import(uuid, UUID_FMT_STR, uuid_str.getBuffer(), uuid_str.strlen());
       if (rc == UUID_RC_OK)
@@ -176,6 +218,7 @@ public:
       }
       return 0;
 #endif
+#endif
    }
 
    DLLLOCAL QoreStringNode *toString(int flags = QUF_NONE) {
@@ -183,6 +226,11 @@ public:
    }
 
    DLLLOCAL bool isNull() const {
+#ifdef WIN_UUID
+      RPC_STATUS rc;
+      UuidIsNil((UUID *)&uuid, &rc);
+      return rc;
+#else
 #ifdef OSSP_UUID
       int result;
       uuid_isnil(uuid, &result);
@@ -190,24 +238,35 @@ public:
 #else
       return uuid_is_null(const_cast<QoreUUID *>(this)->uuid);
 #endif
+#endif
    }
 
    DLLLOCAL void clear() {
+#ifdef WIN_UUID
+      UuidCreateNil(&uuid);
+#else
 #ifdef OSSP_UUID
       uuid_destroy(uuid);
       uuid_create(&uuid);
 #else
       uuid_clear(uuid);
 #endif
+#endif
    }
 
-   DLLLOCAL int compare(const QoreUUID &other) {
+   DLLLOCAL int compare(const QoreUUID &other) const {
+#ifdef WIN_UUID
+      RPC_STATUS rc;
+      UuidCompare((UUID*)&uuid, (UUID*)&other.uuid, &rc);
+      return rc;
+#else
 #ifdef OSSP_UUID
       int result;
       uuid_compare(uuid, other.uuid, &result);
       return result;
 #else
       return uuid_compare(uuid, const_cast<QoreUUID &>(other).uuid);
+#endif
 #endif
    }
 

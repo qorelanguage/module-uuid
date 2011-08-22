@@ -8,6 +8,9 @@ took the following steps to ensure consistent behavior on all platforms:
 * updated implementation to manage case even if the uuid library does not
   support the uuid_unparse_lower() and uuid_unparse_upper() functions
 
+added support for building the module on Windows and with the OSSP UUID library
+note that generation flags are ignored on Windows
+
 
 ***********
 version 1.1

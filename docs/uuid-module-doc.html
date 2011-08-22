@@ -584,8 +584,16 @@ Note that the constant: {{{HAVE_UNPARSE_CASE}}} in this version is always {{{Tru
 |[[static UUID::get(int $str_flags = UUID::None, int $gen_flags = UUID::None) returns string|UUID::get()]]|returns a UUID string without having to create a UUID object|
 </pre>
 </div>
-<div title="UUID Generation Constants" creator="DavidNichols" modifier="DavidNichols" created="201006291115" modified="201006291118" changecount="3">
+<div title="UUID Generation Constants" creator="DavidNichols" modifier="YourName" created="201006291115" modified="201108221608" changecount="4">
 <pre>UUID generation constants affect how the UUID is generated.  All UUID generation constants are integers.
+
+Note that generation constants are ignored when the module is compiled with for Windows.
+
+|!Constant|!Description|h
+|{{{None}}}|No value; this is the default|
+|{{{Random}}}|Force the use of the all-random UUID format, even if a high-quality random number generator is not available for the library|
+|{{{Time}}}|Force the use of the alternative algorithm that uses the current time and local ethernet MAC address (if available); note that this algorithm can leak information about when and where  the UUID was generated|
+|{{{Empty}}}|The UUID will be assigned the null value on creation|
 
 |!Constant|!Description|h
 |{{{None}}}|No value; this is the default|
