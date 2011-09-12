@@ -265,7 +265,7 @@ public:
       uuid_compare(uuid, other.uuid, &result);
       return result;
 #else
-      return uuid_compare(uuid, const_cast<QoreUUID &>(other).uuid);
+      return uuid_compare(const_cast<QoreUUID*>(this)->uuid, const_cast<QoreUUID &>(other).uuid);
 #endif
 #endif
    }
