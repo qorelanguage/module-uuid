@@ -1,9 +1,17 @@
 MNAME=uuid
 
+QC_UUID.cpp: QC_UUID.qpp
+	qpp $<
+
+GENERATED_SOURCES = QC_UUID.cpp
+CLEANFILES = $(GENERATED_SOURCES)
+
 if COND_SINGLE_COMPILATION_UNIT
 UUID_SOURCES = single-compilation-unit.cpp
+single-compilation-unit.cpp: $(GENERATED_SOURCES)
 else
 UUID_SOURCES = uuid-module.cpp
+nodist_uuid_la_SOURCES = $(GENERATED_SOURCES)
 endif
 
 lib_LTLIBRARIES = uuid.la

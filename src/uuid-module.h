@@ -201,7 +201,7 @@ public:
       if (rc == RPC_S_OK)
          return 0;
 
-      xsink->raiseException("UUID-CONSTRUCTOR-ERROR", getErrorString(xsink, uuid_str));
+      xsink->raiseException("UUID-STRING-ERROR", getErrorString(xsink, uuid_str));
       return -1;
 #else
 #ifdef OSSP_UUID
@@ -209,11 +209,11 @@ public:
       if (rc == UUID_RC_OK)
          return 0;
 
-      xsink->raiseException("UUID-CONSTRUCTOR-ERROR", getErrorString(xsink, uuid_str, uuid_error(rc)));
+      xsink->raiseException("UUID-STRING-ERROR", getErrorString(xsink, uuid_str, uuid_error(rc)));
       return -1;
 #else
       if (uuid_parse((char *)uuid_str.getBuffer(), uuid)) {
-         xsink->raiseException("UUID-CONSTRUCTOR-ERROR", getErrorString(xsink, uuid_str));
+         xsink->raiseException("UUID-STRING-ERROR", getErrorString(xsink, uuid_str));
          return -1;
       }
       return 0;

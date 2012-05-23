@@ -1,0 +1,27 @@
+/** @mainpage %Qore uuid Module
+
+    @section intro Introduction
+
+    The uuid module provides <a href="http://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a> functionality
+    to Qore, allowing qore programs to generate and manipulate UUIDs.
+
+    This module is released under the <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">LGPL 2.1</a>
+    and is tagged as such in the module's header (meaning it can be loaded
+    unconditionally regardless of how the Qore library was initialized).
+
+    Like all Qore components, the uuid module is thread-safe.
+
+    The underlying %UUID functionality is provided by any number of supported %UUID libraries, whichever was used at build time.
+
+    @section Example
+
+    The most common usage will be simply to generate a %UUID string:
+    @code
+%requires uuid
+my string $uuid = UUID::get();
+    @endcode
+
+    @section uuid_class UUID class
+
+    See the Qore::UUID::UUID class for information about further %UUID-related functionality in this module.
+*/
