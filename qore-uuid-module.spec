@@ -1,3 +1,4 @@
+%define mod_ver 1.2
 %define module_api %(qore --latest-module-api 2>/dev/null)
 %define module_dir %{_libdir}/qore-modules
 
@@ -34,7 +35,7 @@
 
 Summary: UUID module for Qore
 Name: qore-uuid-module
-Version: 1.2
+Version: %{mod_ver}
 Release: 1%{dist}
 License: LGPL
 Group: Development/Languages
@@ -45,17 +46,30 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: /usr/bin/env
 Requires: qore-module-api-%{module_api}
 BuildRequires: gcc-c++
-BuildRequires: qore-devel >= 0.8
+BuildRequires: qore-devel >= 0.8.5
 BuildRequires: libuuid-devel
 BuildRequires: qore
 
 %description
-UUID module for the Qore Programming Language.
+This package contains the uuid module for the Qore Programming Language.
 
+UUIDs are universally unique identifiers that can be used for any purpose.
 
 %if 0%{?suse_version}
 %debug_package
 %endif
+
+%package doc
+Summary: Documentation and examples for the Qore UUID module
+Group: Development/Languages
+
+%description doc
+This package contains the HTML documentation and example programs for the Qore
+uuid module.
+
+%files doc
+%defattr(-,root,root,-)
+%doc docs/uuid test
 
 %prep
 %setup -q
@@ -76,10 +90,13 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{module_dir}
-%doc COPYING README RELEASE-NOTES ChangeLog AUTHORS test/uuid-test.q docs/uuid-module-doc.html
+%doc COPYING README RELEASE-NOTES ChangeLog AUTHORS
 
 %changelog
-* Wed Jun 30 2010 David Nichols <david@qore.org>
+* Thu May 24 2012 David Nichols <david@qore.org> 1.2
+- updated version to 1.2; updated spec file for qpp/qdx build
+
+* Wed Jun 30 2010 David Nichols <david@qore.org> 1.1
 - updated version to 1.1
 
 * Tue Jun 29 2010 David Nichols <david@qore.org>

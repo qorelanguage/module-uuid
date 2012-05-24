@@ -132,7 +132,7 @@ my bool $b = $uuid.isNull();
     @endcode
  */
 bool UUID::isNull() [flags=CONSTANT] {
-   return get_bool_node(uuid->isNull());
+   return uuid->isNull();
 }
 
 //! Clears the UUID and sets the null value (\c "00000000-0000-0000-0000-000000000000")

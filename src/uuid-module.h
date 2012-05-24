@@ -236,7 +236,7 @@ public:
       uuid_isnil(uuid, &result);
       return result;
 #else
-      return uuid_is_null(const_cast<QoreUUID *>(this)->uuid);
+      return (bool)uuid_is_null(const_cast<QoreUUID *>(this)->uuid);
 #endif
 #endif
    }
