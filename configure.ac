@@ -307,11 +307,16 @@ AC_ARG_WITH([libuuid],
     [with_libuuid=$UUID_DIR])
 
 check_uuid() {
-    inc="$1/include"
-    if test "$1" = "/"; then
+    a="$1"
+    if test \( "$a" = "/" -o -z "$a" \) -a -h "$a/lib${LIBSUFFIX}"; then
+        a=/usr
+    fi
+
+    inc="$a/include"
+    if test "$a" = "/"; then
        inc=/usr/include
     fi
-    #echo DBG: checking $1 inc=$inc
+    #echo DBG: checking $a inc=$inc
     if test -f "$inc/uuid.h"; then
        with_uuid_includes=$inc
     elif test -f "$inc/uuid/uuid.h"; then
@@ -323,9 +328,9 @@ check_uuid() {
        return
     fi
 
-    lib="$1/lib${LIBSUFFIX}"
+    lib="$a/lib${LIBSUFFIX}"
 
-    if test -n "$darwin" -a "$1" = "/usr"; then
+    if test -n "$darwin" -a "$a" = "/usr"; then
        with_uuid_libs=System
        uuid_app_includes=true
        return
@@ -344,7 +349,7 @@ check_uuid() {
     fi
 
     if test -z "$with_uuid_libs"; then
-       #echo uuid $1 libs not found
+       #echo uuid $a libs not found
        unset with_uuid_includes
        return
     fi
@@ -490,7 +495,11 @@ set_qore_cppflags() {
 }
 
 find_qore() {
-    lib=$1/lib${LIBSUFFIX}
+    a="$1"
+    if test \( "$a" = "/" -o -z "" \) -a -h "$a/lib${LIBSUFFIX}"; then
+        a=/usr
+    fi
+    lib=$a/lib${LIBSUFFIX}
 
     # if we only want the static qore libraries
     if test -n "$qore_static"; then
@@ -525,10 +534,10 @@ find_qore() {
 
     AC_MSG_CHECKING([for qore include files])
     # try to find include files
-    if test "$1" = "/"; then
+    if test "$a" = "/"; then
         inc=/usr/include
     else
-        inc=$1/include
+        inc=$a/include
     fi
     if test -f "$inc/qore/Qore.h"; then
         AC_MSG_RESULT([found: $inc])
