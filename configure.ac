@@ -4,7 +4,7 @@
 AC_INIT([qore-uuid-module], [1.2],
         [David Nichols <david@qore.org>],
         [qore-uuid-module])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([no-dist-gzip dist-bzip2])
 AC_CONFIG_HEADER([config.h])
 
 AC_LANG(C++)

@@ -40,7 +40,7 @@ Release: 1%{dist}
 License: LGPL
 Group: Development/Languages
 URL: http://qore.org
-Source: http://prdownloads.sourceforge.net/qore/%{name}-%{version}.tar.gz
+Source: http://prdownloads.sourceforge.net/qore/%{name}-%{version}.tar.bz2
 #Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: /usr/bin/env
