@@ -1,4 +1,4 @@
-%define mod_ver 1.2
+%define mod_ver 1.3
 %define module_api %(qore --latest-module-api 2>/dev/null)
 %define module_dir %{_libdir}/qore-modules
 
@@ -93,6 +93,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING README RELEASE-NOTES ChangeLog AUTHORS
 
 %changelog
+* Wed Fed 27 2013 David Nichols <david@qore.org> 1.3
+- updated version to 1.3
+
 * Thu May 24 2012 David Nichols <david@qore.org> 1.2
 - updated version to 1.2; updated spec file for qpp/qdx build
 

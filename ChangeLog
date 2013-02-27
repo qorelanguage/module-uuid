@@ -1,0 +1,142 @@
+2012-09-28 16:19  david_nichols
+
+	* configure.ac: applied reini urban's multi-arch patches for debian
+	  to all modules
+
+2012-08-28 07:22  david_nichols
+
+	* configure.ac, qore-uuid-module.spec: use bz2 instead of gz
+
+2012-06-25 08:51  david_nichols
+
+	* configure.ac: updated configure.ac logic to deal with /lib ->
+	  /usr/lib and /lib64 -> /usr/lib64 as with Fedora 17 - the
+	  previous logic was too clever for its own good
+
+2012-05-24 17:16  david_nichols
+
+	* Makefile.am, docs/doxygen-api-filter.q, qore-uuid-module.spec,
+	  src/QC_UUID.qpp, src/uuid-module.h: updated build to use qdx;
+	  fixed a bug in UUID::isNull() introduced with the qpp port, fixed
+	  rpm building from the spec file
+
+2012-05-23 15:54  david_nichols
+
+	* Makefile.am, configure.ac, docs/doxyfile.tmpl,
+	  docs/doxygen-api-filter.q, docs/footer_template.html,
+	  docs/mainpage.doxygen.tmpl, docs/uuid-module-doc.html,
+	  src/Makefile.am, src/QC_UUID.qpp,
+	  src/single-compilation-unit.cpp, src/uuid-module.cpp,
+	  src/uuid-module.h: updated the uuid module to qpp; set minimum
+	  qore version to 0.8.5; deleted old stick wiki docs
+
+2012-01-16 13:07  david_nichols
+
+	* configure.ac: updated configure scripts to only set LIBSUFFIX=64
+	  on 64-bit platfiorms if /usr/lib64 exists
+
+2011-09-12 17:02  david_nichols
+
+	* src/uuid-module.h: fix for buggy uuid headers (not const correct)
+
+2011-09-12 16:26  david_nichols
+
+	* configure.ac: added -mt to compile and link lines when building
+	  on solaris with CC
+
+2011-09-02 15:19  subik
+
+	* ChangeLog: missing file for make dist
+
+2011-08-22 16:10  david_nichols
+
+	* RELEASE-NOTES, configure.ac, docs/uuid-module-doc.html,
+	  src/uuid-module.h: updated the module to compile with the native
+	  Windows (RPC) UUID API (no external libraries are necessary on
+	  Windows anymore); updated the docs and release notes accordingly
+
+2011-07-29 16:08  david_nichols
+
+	* src/uuid-module.h: module is now working with ossp uuid and under
+	  windows with mingw32
+
+2011-07-29 15:59  david_nichols
+
+	* README, configure.ac, src/Makefile.am, src/uuid-module.h: mingw32
+	  changes; ported to ossp uuid API for mingw, which is different
+	  from
+	  the Linux/OSX/Solaris standard from Ted Ts'o, but still not
+	  working
+
+2010-12-17 17:00  david_nichols
+
+	* README: separated xml functionality from qore and moved into
+	  separate module ("xml") -
+	  docs not yet moved
+
+2010-11-08 16:47  david_nichols
+
+	* docs/uuid-module-doc.html: fixed mysql and sybase auto-reconnect
+	  logic to use the new Datasource::activeTransaction() API method
+
+2010-10-29 08:44  david_nichols
+
+	* docs/uuid-module-doc.html, src/uuid-module.cpp: updated docs
+
+2010-10-29 08:37  david_nichols
+
+	* RELEASE-NOTES, configure.ac, qore-uuid-module.spec,
+	  src/uuid-module.h: updated to version 1.2; took the following
+	  steps to ensure consistent behavior on all platforms:
+	  * modified the default output (without any flags) to always be a
+	  string with
+	  lower-case hex digit letters
+	  * updated implementation to manage case even if the uuid library
+	  does not
+	  support the uuid_unparse_lower() and uuid_unparse_upper()
+	  functions
+
+2010-06-30 10:56  david_nichols
+
+	* docs/uuid-module-doc.html, src/uuid-module.cpp,
+	  src/uuid-module.h: swapped argument order of UUID::get()
+
+2010-06-30 10:53  david_nichols
+
+	* README-BINARIES, RELEASE-NOTES, configure.ac,
+	  docs/uuid-module-doc.html, qore-uuid-module.spec,
+	  src/uuid-module.cpp, src/uuid-module.h, test/uuid-test.q: updated
+	  release to 1.1
+	  added new method: static UUID::get(int $gen_flags = UUID::None,
+	  int $str_flags = UUID::None) returns string
+	  updated test script
+	  documented new method and made minor documentation corrections
+
+2010-06-29 13:50  david_nichols
+
+	* src/uuid-module.h, test/uuid-test.q: updated test script and
+	  fixed compilation with g++
+
+2010-06-29 13:37  david_nichols
+
+	* test/uuid-test.q: updated test
+
+2010-06-29 13:24  david_nichols
+
+	* configure.ac, src/uuid-module.cpp, src/uuid-module.h,
+	  test/uuid-test.q: solaris build fixes
+
+2010-06-29 11:55  david_nichols
+
+	* configure.ac, src/uuid-module.h: fixes for compiling on
+	  darwin/OSX with uuid functions in the System library
+
+2010-06-29 11:38  david_nichols
+
+	* ., AUTHORS, COPYING, Makefile.am, README, RELEASE-NOTES,
+	  configure.ac, docs, docs/uuid-module-doc.html, m4,
+	  m4/acx_pthread.m4, qore-uuid-module.spec, reconf.sh, src,
+	  src/Makefile.am, src/single-compilation-unit.cpp,
+	  src/uuid-module.cpp, src/uuid-module.h, test, test/uuid-test.q:
+	  checking in new uuid module
+
