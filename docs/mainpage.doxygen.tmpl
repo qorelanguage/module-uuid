@@ -1,5 +1,7 @@
 /** @mainpage %Qore uuid Module
 
+    @tableofcontents
+
     @section intro Introduction
 
     The uuid module provides <a href="http://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a> functionality
@@ -24,4 +26,27 @@ my string $uuid = UUID::get();
     @section uuid_class UUID class
 
     See the Qore::UUID::UUID class for information about further %UUID-related functionality in this module.
+
+    @section releasenotes Release Notes
+
+    @subsection v_1_2 Version 1.2
+
+    - took the following steps to ensure consistent behavior on all platforms:
+      - modified the default output (without any flags) to always be a string with lower-case hex digit letters
+      - updated implementation to manage case even if the uuid library does not support the uuid_unparse_lower() and uuid_unparse_upper() functions
+    - added support for building the module on Windows and with the OSSP UUID library
+    - note that UUID generation flags are ignored on Windows
+
+    @subsection v_1_1 Version 1.1
+
+    - added the following static method allowing a string UUID to be returned immediately without creating an object:
+      - static @ref Qore::UUID::UUID::get(int, int) "UUID::get()"
+    - minor corrections were made in the documentation
+
+    @subsection v_1_0 Version 1.0
+
+    - Initial release of the uuid module
+    - Requires qore 0.8.0+ to build and run
+
+    
 */
