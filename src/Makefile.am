@@ -30,6 +30,10 @@ AM_CXXFLAGS=-g
 endif
 endif
 
+if COND_WIN
+RM_OTHER=$(DESTDIR)$(libdir)/$(MNAME).dll.a
+endif
+
 install-exec-hook:
 	mv $(DESTDIR)$(libdir)/$(MNAME).$(MODULE_SUFFIX) $(DESTDIR)$(libdir)/$(MNAME)-api-$(MODULE_API).qmod
-	$(RM) $(DESTDIR)$(libdir)/$(MNAME).la $(DESTDIR)$(libdir)/$(MNAME).dll.a
+	$(RM) $(DESTDIR)$(libdir)/$(MNAME).la $(DESTDIR)$(libdir)/$(MNAME).a $(RM_OTHER)
