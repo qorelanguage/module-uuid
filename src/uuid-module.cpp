@@ -2,7 +2,7 @@
 /*
   uuid Qore module
 
-  Copyright (C) 2010 - 2012 David Nichols
+  Copyright (C) 2010 - 2014 David Nichols
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,12 @@ DLLEXPORT int qore_module_api_minor = QORE_MODULE_API_MINOR;
 DLLEXPORT qore_module_init_t qore_module_init = uuid_module_init;
 DLLEXPORT qore_module_ns_init_t qore_module_ns_init = uuid_module_ns_init;
 DLLEXPORT qore_module_delete_t qore_module_delete = uuid_module_delete;
+#ifdef _QORE_HAS_QL_MIT
+DLLEXPORT qore_license_t qore_module_license = QL_MIT;
+#else
 DLLEXPORT qore_license_t qore_module_license = QL_LGPL;
+#endif
+DLLEXPORT char qore_module_license_str[] = "MIT";
 
 DLLLOCAL QoreClass* initUUIDClass(QoreNamespace &ns);
 
