@@ -416,9 +416,9 @@ if test "${with_uuid}" = yes; then
     if test "$windows" = yes; then
        # check if C++ compiler can link with UUID libs
        SAVE_CXXFLAGS="$CXXFLAGS"
-       SAVE_LDFLAGS="$LDFLAGS"
-       CXXFLAGS="$CXXFLAGS $UUID_CPPFLAGS"
-       LDFLAGS="$LDFLAGS $UUID_LIBS"
+       SAVE_LIBS="$LIBS"
+       CPPFLAGS="$CPPFLAGS $UUID_CPPFLAGS"
+       LIBS="$LIBS $UUID_LIBS"
 
        # see if the windows UUID support is available
        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
@@ -430,6 +430,10 @@ UUID uuid; UuidCreate(&uuid);
        if test "$win_uuid" = "no"; then
           AC_MSG_ERROR([failed to compile a test program with the Windows UUID API])
        fi
+
+       CPPFLAGS="$SAVE_CPPFLAGS"
+       LIBS="$SAVE_LIBS"
+
        AC_SUBST(UUID_LIBS)
        with_uuid=yes
     else
@@ -458,10 +462,10 @@ UUID uuid; UuidCreate(&uuid);
        fi
 
        # check if C++ compiler can link with UUID libs
-       SAVE_CXXFLAGS="$CXXFLAGS"
-       SAVE_LDFLAGS="$LDFLAGS"
-       CXXFLAGS="$CXXFLAGS $UUID_CPPFLAGS"
-       LDFLAGS="$LDFLAGS $UUID_LIBS"
+       SAVE_CPPFLAGS="$CPPFLAGS"
+       SAVE_LIBS="$LIBS"
+       CPPFLAGS="$CPPFLAGS $UUID_CPPFLAGS"
+       LIBS="$LIBS $UUID_LIBS"
 
        # see if it's OSSP UUID
        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
@@ -485,8 +489,8 @@ uuid_t uu;
 uuid_parse(in, uu);
 	  ]])], uuid_links=yes, uuid_links=no)
 
-          CXXFLAGS="$SAVE_CXXFLAGS"
-          LDFLAGS="$SAVE_LDFLAGS"
+          CPPFLAGS="$SAVE_CPPFLAGS"
+	  LIBS="$SAVE_LIBS"
 
           if test "$uuid_links" = "no"; then
              AC_MSG_ERROR([could not compile a test libuuid program])
