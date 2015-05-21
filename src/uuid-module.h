@@ -24,7 +24,9 @@
 #ifndef _QORE_UUID_MODULE_H
 #define _QORE_UUID_MODULE_H
 
+#ifdef HAVE_CONFIG_H
 #include "../config.h"
+#endif
 
 #include <qore/Qore.h>
 
