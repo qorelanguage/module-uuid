@@ -387,7 +387,7 @@ if test "${with_libuuid}" != "no"; then
          check_uuid "$with_libuuid"
       	 if test -z "$with_uuid_includes"; then
 	    AC_MSG_ERROR([not found in $with_libuuid])
-      	 fi      
+      	 fi
       else
 	 for dir in "${with_lib_prefix}" "${find_prefix}" / /usr /usr/local /opt/uuid /usr/uuid /sw /opt/local /opt/sfw /usr/sfw /opt/gnu; do
             check_uuid $dir
@@ -396,7 +396,7 @@ if test "${with_libuuid}" != "no"; then
             fi
       	 done
       fi
-   
+
       if test -n "$with_uuid_includes"; then
          if test -n "$uuid_static"; then
 	    AC_MSG_RESULT([includes=$with_uuid_includes, libs=$with_uuid_libs (static)])
@@ -513,7 +513,7 @@ set_qore_cppflags() {
 
 find_qore() {
     a="$1"
-    if test \( "$a" = "/" -o -z "" \) -a -h "$a/lib${LIBSUFFIX}"; then
+    if test \( "$a" = "/" -o -z "$a" \) -a -h "$a/lib${LIBSUFFIX}"; then
         a=/usr
     fi
     lib=$a/lib${LIBSUFFIX}
@@ -718,7 +718,7 @@ if test "$enable_optimization" = "yes"; then
     elif test "$CXX" = "CC" -a "`echo $host_os|cut -b-7`" = "solaris"; then
         # remove -g with Solaris CC as it reduces optimization levels
 	CXXFLAGS="`echo $CXXFLAGS| sed s/-g//` -xO5" # Solaris CC
-    elif test -n "`echo $CXX|grep aCC`"; then 
+    elif test -n "`echo $CXX|grep aCC`"; then
         # remove -g with HP-UX aCC as it reduces optimization levels
 	CXXFLAGS="`echo $CXXFLAGS| sed s/-g//` +O4" # HP-UX aCC
     fi
