@@ -1,7 +1,7 @@
 /* -*- mode: c++; indent-tabs-mode: nil -*- */
 /*
   uuid-module.h
-  
+
   Qore Programming Language
 
   Copyright 2010 - 2011 David Nichols
@@ -85,9 +85,9 @@ protected:
          str->tolwr();
 #else // WIN_UUID
 #ifdef OSSP_UUID
+      char *buf = 0;
       size_t len = 0;
 #ifdef DEBUG
-      char *buf = 0;
       uuid_rc_t rc = uuid_export(uuid, UUID_FMT_STR, &buf, &len);
       if (rc != UUID_RC_OK)
          printd(0, "uuid_export error: %d: %s\n", rc, uuid_error(rc));
