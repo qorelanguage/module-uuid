@@ -4,7 +4,7 @@
 
   Qore Programming Language
 
-  Copyright 2010 - 2011 David Nichols
+  Copyright 2010 - 2016 David Nichols
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -30,8 +30,9 @@
 
 #include <qore/Qore.h>
 
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if _Q_WINDOWS
 #define WIN_UUID 1
+#include <windows.h>
 #else
 #include <uuid.h>
 #endif
