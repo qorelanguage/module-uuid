@@ -431,7 +431,7 @@ fi
 if test "${with_uuid}" = yes; then
     if test "$windows" = yes; then
        # check if C++ compiler can link with UUID libs
-       SAVE_CXXFLAGS="$CXXFLAGS"
+       SAVE_CPPFLAGS="$CPPFLAGS"
        SAVE_LIBS="$LIBS"
        CPPFLAGS="$CPPFLAGS $UUID_CPPFLAGS"
        LIBS="$LIBS $UUID_LIBS"
