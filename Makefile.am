@@ -4,7 +4,7 @@ SUBDIRS = src
 
 noinst_HEADERS = src/uuid-module.h
 
-EXTRA_DIST = COPYING.MIT COPYING.LGPL ChangeLog AUTHORS README \
+EXTRA_DIST = COPYING.MIT COPYING.LGPL AUTHORS README \
 	RELEASE-NOTES \
 	src/QC_UUID.qpp \
 	test/uuid-test.q \
@@ -68,4 +68,3 @@ tests:
 
 tests-ci:
 	@for i in $(TESTSCRIPTS); do qore $$i --format=junit --verbose; done
-
