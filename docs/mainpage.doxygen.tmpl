@@ -20,7 +20,8 @@
     The most common usage will be simply to generate a %UUID string:
     @code
 %requires uuid
-my string $uuid = UUID::get();
+%new-style
+string uuid = UUID::get();
     @endcode
 
     @section uuid_class UUID class
@@ -29,7 +30,11 @@ my string $uuid = UUID::get();
 
     @section uuidreleasenotes Release Notes
 
-    @subsection v_1_2 Version 1.2
+    @subsection uuid_v_1_3 Version 1.3
+
+    - minor build and packaging fixes
+
+    @subsection uuid_v_1_2 Version 1.2
 
     - took the following steps to ensure consistent behavior on all platforms:
       - modified the default output (without any flags) to always be a string with lower-case hex digit letters
@@ -37,16 +42,16 @@ my string $uuid = UUID::get();
     - added support for building the module on Windows and with the OSSP UUID library
     - note that UUID generation flags are ignored on Windows
 
-    @subsection v_1_1 Version 1.1
+    @subsection uuid_v_1_1 Version 1.1
 
     - added the following static method allowing a string UUID to be returned immediately without creating an object:
       - static @ref Qore::UUID::UUID::get(int, int) "UUID::get()"
     - minor corrections were made in the documentation
 
-    @subsection v_1_0 Version 1.0
+    @subsection uuid_v_1_0 Version 1.0
 
     - Initial release of the uuid module
     - Requires qore 0.8.0+ to build and run
 
-    
+
 */
