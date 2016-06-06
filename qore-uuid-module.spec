@@ -90,10 +90,10 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{module_dir}
-%doc COPYING.MIT COPYING.LGPL README RELEASE-NOTES ChangeLog AUTHORS
+%doc COPYING.MIT COPYING.LGPL README RELEASE-NOTES AUTHORS
 
 %changelog
-* Wed Fed 27 2013 David Nichols <david@qore.org> 1.3
+* Wed Feb 27 2013 David Nichols <david@qore.org> 1.3
 - updated version to 1.3
 
 * Thu May 24 2012 David Nichols <david@qore.org> 1.2
