@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(qore-uuid-module)
 
 set (VERSION_MAJOR 1)
-set (VERSION_MINOR 3)
+set (VERSION_MINOR 4)
 set (VERSION_PATCH 0)
 
 
