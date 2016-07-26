@@ -11,6 +11,15 @@ find_package(Qore REQUIRED)
 
 include_directories( ${CMAKE_SOURCE_DIR}/src )
 
+# Check for C++11.
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+else()
+    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 include(CheckFunctionExists)
 # Some systems include uuid automatically (OS X), others need the includes/library
 check_function_exists (uuid_unparse_lower HAVE_UUID)
