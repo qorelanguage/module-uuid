@@ -373,6 +373,8 @@ check_uuid() {
        with_uuid_includes=$inc
     elif test -f "$inc/uuid/uuid.h"; then
        with_uuid_includes=$inc/uuid
+    elif test -f "$inc/ossp/uuid.h"; then
+       with_uuid_includes=$inc/uuid
     fi
 
     if test -z "$with_uuid_includes"; then
