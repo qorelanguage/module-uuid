@@ -20,12 +20,13 @@ else()
     message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+find_path(UUID_INCLUDE_DIR uuid.h PATH_SUFFIXES uuid ossp)
+
 include(CheckFunctionExists)
 # Some systems include uuid automatically (OS X), others need the includes/library
 check_function_exists (uuid_unparse_lower HAVE_UUID)
 if (NOT HAVE_UUID)
     message ("-- Looking for libuuid")
-    find_path(UUID_INCLUDE_DIR uuid/uuid.h)
     find_library(UUID_LIBRARY NAMES uuid)
     if (UUID_INCLUDE_DIR AND UUID_LIBRARY)
         message ("-- Found libuuid: ${UUID_LIBRARY}")
@@ -35,7 +36,7 @@ if (NOT HAVE_UUID)
     endif (UUID_INCLUDE_DIR AND UUID_LIBRARY)
 endif (NOT HAVE_UUID)
 
-include_directories(${UUID_INCLUDE_DIR}/uuid)
+include_directories(${UUID_INCLUDE_DIR})
 
 set(QPP_SRC
     src/QC_UUID.qpp
