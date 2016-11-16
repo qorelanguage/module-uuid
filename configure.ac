@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # AC_PREREQ(2.59)
-AC_INIT([qore-uuid-module], [1.3],
+AC_INIT([qore-uuid-module], [1.4],
         [David Nichols <david@qore.org>],
         [qore-uuid-module])
 AM_INIT_AUTOMAKE([no-dist-gzip dist-bzip2])
@@ -300,6 +300,12 @@ else
    bits=32
 fi
 
+# test for C++11
+AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+if test "$HAVE_CXX11" = "1"; then
+    AM_CXXFLAGS=-std=gnu++11
+fi
+
 # checks for how to build threads
 ACX_PTHREAD
 if test "$acx_pthread_ok" = "no"; then
@@ -366,6 +372,8 @@ check_uuid() {
     if test -f "$inc/uuid.h"; then
        with_uuid_includes=$inc
     elif test -f "$inc/uuid/uuid.h"; then
+       with_uuid_includes=$inc/uuid
+    elif test -f "$inc/ossp/uuid.h"; then
        with_uuid_includes=$inc/uuid
     fi
 
