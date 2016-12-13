@@ -1,7 +1,13 @@
 MNAME=uuid
 
+if COND_MINGW
+QPP=qpp_native
+else
+QPP=qpp
+endif
+
 QC_UUID.cpp: QC_UUID.qpp
-	qpp $<
+	$(QPP) $<
 
 GENERATED_SOURCES = QC_UUID.cpp
 CLEANFILES = $(GENERATED_SOURCES)

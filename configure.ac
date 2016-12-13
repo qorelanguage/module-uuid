@@ -803,7 +803,8 @@ AM_CONDITIONAL([COND_DOXYGEN],    [test -n "$with_doxygen"])
 AM_CONDITIONAL([COND_DEBUG],      [test "$enable_debug" = yes])
 AM_CONDITIONAL([COND_PROFILE],    [test "$enable_profile" = yes])
 AM_CONDITIONAL([COND_SINGLE_COMPILATION_UNIT], [test "$enable_single_compilation_unit" = yes])
-AM_CONDITIONAL([COND_WIN],      [test "$windows" = yes])
+AM_CONDITIONAL([COND_MINGW],      [test "$mingw" = yes])
+AM_CONDITIONAL([COND_WIN],        [test "$windows" = yes])
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
 
