@@ -31,7 +31,11 @@
 #if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
 #define WIN_UUID 1
 #else
+#ifdef OSSP_UUID
 #include <uuid.h>
+#else
+#include <uuid/uuid.h>
+#endif
 #endif
 
 #ifndef _UUID_STRING_T
