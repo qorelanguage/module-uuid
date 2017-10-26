@@ -1,10 +1,10 @@
 /* -*- mode: c++; indent-tabs-mode: nil -*- */
 /*
   uuid-module.h
-  
+
   Qore Programming Language
 
-  Copyright 2010 - 2011 David Nichols
+  Copyright 2010 - 2016 David Nichols
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -24,12 +24,15 @@
 #ifndef _QORE_UUID_MODULE_H
 #define _QORE_UUID_MODULE_H
 
+#ifdef HAVE_CONFIG_H
 #include "../config.h"
+#endif
 
 #include <qore/Qore.h>
 
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if _Q_WINDOWS
 #define WIN_UUID 1
+#include <windows.h>
 #else
 #ifdef OSSP_UUID
 #include <uuid.h>
@@ -87,9 +90,9 @@ protected:
          str->tolwr();
 #else // WIN_UUID
 #ifdef OSSP_UUID
+      char *buf = 0;
       size_t len = 0;
 #ifdef DEBUG
-      char *buf = 0;
       uuid_rc_t rc = uuid_export(uuid, UUID_FMT_STR, &buf, &len);
       if (rc != UUID_RC_OK)
          printd(0, "uuid_export error: %d: %s\n", rc, uuid_error(rc));

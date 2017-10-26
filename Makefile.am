@@ -4,11 +4,13 @@ SUBDIRS = src
 
 noinst_HEADERS = src/uuid-module.h
 
-EXTRA_DIST = COPYING.MIT COPYING.LGPL ChangeLog AUTHORS README \
+EXTRA_DIST = COPYING.MIT COPYING.LGPL AUTHORS README \
 	RELEASE-NOTES \
 	src/QC_UUID.qpp \
 	test/uuid-test.q \
 	qore-uuid-module.spec
+
+TESTSCRIPTS=test/uuid-test.q
 
 ACLOCAL_AMFLAGS=-I m4
 
@@ -60,3 +62,9 @@ docs/mainpage.doxygen: docs/mainpage.doxygen.tmpl
 
 docs/doxyfile: docs/doxyfile.tmpl
 	sed s/__VERSION__/${VERSION}/ $< > $@
+
+tests:
+	@for i in $(TESTSCRIPTS); do qore $$i --format=plain; done
+
+tests-ci:
+	@for i in $(TESTSCRIPTS); do qore $$i --format=junit --verbose; done
