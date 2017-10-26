@@ -501,7 +501,7 @@ UUID uuid; UuidCreate(&uuid);
        LIBS="$LIBS $UUID_LIBS"
 
        # see if it's OSSP UUID
-       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+       AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <uuid.h>
    	   ]],[[
 uuid_t *up; uuid_create(&up);
@@ -512,7 +512,7 @@ uuid_t *up; uuid_create(&up);
        else
           # check for UNIX/Ted Ts'o's UUID library
           AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-#include <uuid.h>
+#include <uuid/uuid.h>
 	  ]],[[
 #ifndef _UUID_STRING_t
 typedef char* uuid_string_t;

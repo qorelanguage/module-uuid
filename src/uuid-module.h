@@ -34,7 +34,11 @@
 #define WIN_UUID 1
 #include <windows.h>
 #else
+#ifdef OSSP_UUID
 #include <uuid.h>
+#else
+#include <uuid/uuid.h>
+#endif
 #endif
 
 #ifndef _UUID_STRING_T
