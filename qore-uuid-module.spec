@@ -1,4 +1,4 @@
-%define mod_ver 1.3
+%define mod_ver 1.4
 %define module_api %(qore --latest-module-api 2>/dev/null)
 %define module_dir %{_libdir}/qore-modules
 
@@ -46,7 +46,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: /usr/bin/env
 Requires: qore-module-api-%{module_api}
 BuildRequires: gcc-c++
-BuildRequires: qore-devel >= 0.8.5
+BuildRequires: qore-devel >= 0.8.13
 BuildRequires: libuuid-devel
 BuildRequires: qore
 
@@ -93,6 +93,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING.MIT COPYING.LGPL README RELEASE-NOTES AUTHORS
 
 %changelog
+* Tue May 1 2018 David Nichols <david@qore.org> 1.4
+- updated version to 1.4
+
 * Wed Feb 27 2013 David Nichols <david@qore.org> 1.3
 - updated version to 1.3
 
