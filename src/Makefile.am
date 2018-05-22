@@ -7,7 +7,7 @@ QPP=qpp
 endif
 
 QC_UUID.cpp: QC_UUID.qpp
-	$(QPP) $<
+	$(QPP) -V $<
 
 GENERATED_SOURCES = QC_UUID.cpp
 CLEANFILES = $(GENERATED_SOURCES)
