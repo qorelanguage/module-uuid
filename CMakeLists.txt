@@ -7,7 +7,7 @@ set (VERSION_MINOR 4)
 set (VERSION_PATCH 0)
 
 
-find_package(Qore REQUIRED)
+find_package(Qore 0.9 REQUIRED)
 
 include_directories( ${CMAKE_SOURCE_DIR}/src )
 
@@ -49,7 +49,7 @@ set(CPP_SRC
 set(QMOD
 )
 
-qore_wrap_qpp(QPP_SOURCES ${QPP_SRC})
+qore_wrap_qpp_value(QPP_SOURCES ${QPP_SRC})
 
 SET (module_name "uuid")
 
