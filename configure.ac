@@ -662,18 +662,37 @@ else
    mapi_major=`qore --latest-module-api|cut -f1 -d.`
    mapi_minor=`qore --latest-module-api|cut -f2 -d.`
 
-   AC_SUBST(MODULE_API)
-
    if test -z "${prefix}" -o "${prefix}" = "NONE"; then
       libdir=`qore --module-dir`
+      userlibdir=`qore --user-module-dir 2>/dev/null`
+      if test -z "${userlibdir}"; then
+         userlibdir="${libdir}"
+      fi
+      prefix=`which qore|sed s/.bin.qore//`
    else
       libdir="$prefix/lib${LIBSUFFIX}/qore-modules"
       qlibdir=`qore --module-dir`
       if test "$libdir" != "$qlibdir"; then
          AC_MSG_WARN([warning, installed qore's module dir is $qlibdir, this module will be installed in $libdir])
       fi
+      if test -z "${datarootdir}"; then
+         datarootdir="$prefix/share";
+         AC_SUBST([datarootdir])
+      fi
+      if test -n "echo ${datarootdir}|grep \$"; then
+         userlibdir="`eval echo ${datarootdir}`/qore-modules"
+      else
+         userlibdir="${datarootdir}/qore-modules"
+      fi
+      qlibdir=`qore --user-module-dir`
+      if test "$userlibdir" != "$qlibdir"; then
+         AC_MSG_WARN([warning, installed qore's user module dir is $qlibdir, this module will be installed in $userlibdir])
+      fi
    fi
 fi
+AC_SUBST([userlibdir])
+usermoddir="`echo ${userlibdir}|sed s/-modules.*//`"
+AC_SUBST([usermoddir])
 
 AC_ARG_ENABLE([profile],
      [AS_HELP_STRING([--enable-profile],
