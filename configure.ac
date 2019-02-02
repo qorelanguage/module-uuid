@@ -662,6 +662,8 @@ else
    mapi_major=`qore --latest-module-api|cut -f1 -d.`
    mapi_minor=`qore --latest-module-api|cut -f2 -d.`
 
+   AC_SUBST(MODULE_API)
+
    if test -z "${prefix}" -o "${prefix}" = "NONE"; then
       libdir=`qore --module-dir`
       userlibdir=`qore --user-module-dir 2>/dev/null`
