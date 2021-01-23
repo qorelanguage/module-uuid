@@ -57,7 +57,7 @@ set(QORE_DOX_TMPL_SRC
   docs/mainpage.doxygen.tmpl
 )
 
-add_library(${module_name} SHARED ${QPP_SOURCES} ${CPP_SRC})
+add_library(${module_name} MODULE ${QPP_SOURCES} ${CPP_SRC})
 
 qore_binary_module(${module_name} "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ${UUID_LIBRARY})
 qore_user_modules("${QMOD}")
@@ -72,4 +72,3 @@ if (DOXYGEN_FOUND)
     add_custom_target(QORE_MOD_DOX_FILES DEPENDS ${QORE_DOX_SRC})
     add_dependencies(docs QORE_MOD_DOX_FILES)
 endif()
-
