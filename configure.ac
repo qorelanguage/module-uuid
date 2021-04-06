@@ -468,72 +468,82 @@ else
 fi
 
 if test "${with_uuid}" = yes; then
-    if test "$windows" = yes; then
-       # check if C++ compiler can link with UUID libs
-       SAVE_CPPFLAGS="$CPPFLAGS"
-       SAVE_LIBS="$LIBS"
-       CPPFLAGS="$CPPFLAGS $UUID_CPPFLAGS"
-       LIBS="$LIBS $UUID_LIBS"
+  if test "$windows" = yes; then
+    # check if C++ compiler can link with UUID libs
+    SAVE_CPPFLAGS="$CPPFLAGS"
+    SAVE_LIBS="$LIBS"
+    CPPFLAGS="$CPPFLAGS $UUID_CPPFLAGS"
+    LIBS="$LIBS $UUID_LIBS"
 
-       # see if the windows UUID support is available
-       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    # see if the windows UUID support is available
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <windows.h>
    	   ]],[[
 UUID uuid; UuidCreate(&uuid);
 	   ]])], win_uuid=yes, win_uuid=no)
 
-       if test "$win_uuid" = "no"; then
-          AC_MSG_ERROR([failed to compile a test program with the Windows UUID API])
-       fi
+    if test "$win_uuid" = "no"; then
+      AC_MSG_ERROR([failed to compile a test program with the Windows UUID API])
+    fi
 
-       CPPFLAGS="$SAVE_CPPFLAGS"
-       LIBS="$SAVE_LIBS"
+    CPPFLAGS="$SAVE_CPPFLAGS"
+    LIBS="$SAVE_LIBS"
 
-       AC_SUBST(UUID_LIBS)
-       with_uuid=yes
+    AC_SUBST(UUID_LIBS)
+    with_uuid=yes
+  else
+    # only set include path if necessary
+    if test -n "$uuid_app_includes"; then
+      UUID_CPPFLAGS="-I$with_uuid_includes"
+    fi
+    if test -n "$uuid_static"; then
+      UUID_LIBS="$with_uuid_libs/libuuid.a"
     else
-       # only set include path if necessary
-       if test -n "$uuid_app_includes"; then
-          UUID_CPPFLAGS="-I$with_uuid_includes"
-       fi
-       if test -n "$uuid_static"; then
-          UUID_LIBS="$with_uuid_libs/libuuid.a"
-       else
-          if test -n "$uuid_app_libs"; then
-	     UUID_LIBS="-L$with_uuid_libs -luuid"
-	  elif test "$with_uuid_libs" != "System"; then
-	     UUID_LIBS="-luuid"
-	  fi
-       fi
+      if test -n "$uuid_app_libs"; then
+        UUID_LIBS="-L$with_uuid_libs -luuid"
+      elif test "$with_uuid_libs" != "System"; then
+        UUID_LIBS="-luuid"
+      fi
+    fi
+    
+    # check for uuid_unparse_upper() and uuid_unparse_lower()
+    AC_MSG_CHECKING([for uuid_unparse_upper() and uuid_unparse_lower()])
+    uuid_ul="`grep -e uuid_unparse_upper -e uuid_unparse_lower $with_uuid_includes/uuid.h 2>/dev/null`"
+    if test -n "$uuid_ul"; then
+      AC_DEFINE(HAS_UUID_UNPARSE_CASE, 1, [if uuid_unparse_lower() and uuid_unparse_upper() are available])
+      AC_MSG_RESULT([yes])
+    else
+      AC_MSG_RESULT([no])
+    fi
 
-       # check for uuid_unparse_upper() and uuid_unparse_lower()
-       AC_MSG_CHECKING([for uuid_unparse_upper() and uuid_unparse_lower()])
-       uuid_ul="`grep -e uuid_unparse_upper -e uuid_unparse_lower $with_uuid_includes/uuid.h 2>/dev/null`"
-       if test -n "$uuid_ul"; then
-    	  AC_DEFINE(HAS_UUID_UNPARSE_CASE, 1, [if uuid_unparse_lower() and uuid_unparse_upper() are available])
- 	  AC_MSG_RESULT([yes])
-       else
-          AC_MSG_RESULT([no])
-       fi
+    # check if C++ compiler can link with UUID libs
+    SAVE_CPPFLAGS="$CPPFLAGS"
+    SAVE_LIBS="$LIBS"
+    CPPFLAGS="$CPPFLAGS $UUID_CPPFLAGS"
+    LIBS="$LIBS $UUID_LIBS"
 
-       # check if C++ compiler can link with UUID libs
-       SAVE_CPPFLAGS="$CPPFLAGS"
-       SAVE_LIBS="$LIBS"
-       CPPFLAGS="$CPPFLAGS $UUID_CPPFLAGS"
-       LIBS="$LIBS $UUID_LIBS"
+    # see if it's OSSP UUID
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <uuid.h>
+   	   ]],[[
+uuid_t up; uuid_generate(up);
+	   ]])], ossp_uuid=yes, ossp_uuid=no)
 
-       # see if it's OSSP UUID
-       AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+    if test "$ossp_uuid" = yes; then
+      UUID_CPPFLAGS="$UUID_CPPFLAGS -DOSSP_UUID=1"
+    else
+      # see if it's OSSP UUID
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <uuid.h>
    	   ]],[[
 uuid_t *up; uuid_create(&up);
 	   ]])], ossp_uuid=yes, ossp_uuid=no)
 
-       if test "$ossp_uuid" = yes; then
-          UUID_CPPFLAGS="$UUID_CPPFLAGS -DOSSP_UUID=1"
-       else
-          # check for UNIX/Ted Ts'o's UUID library
-          AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+      if test "$ossp_uuid" = yes; then
+        UUID_CPPFLAGS="$UUID_CPPFLAGS -DOSSP_UUID=1 -DOSSP_UUID_CREATE=1"
+      else
+        # check for UNIX/Ted Ts'o's UUID library
+        AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <uuid/uuid.h>
 	  ]],[[
 #ifndef _UUID_STRING_t
@@ -543,18 +553,20 @@ uuid_string_t in;
 uuid_t uu;
 uuid_parse(in, uu);
 	  ]])], uuid_links=yes, uuid_links=no)
+      fi
 
-          CPPFLAGS="$SAVE_CPPFLAGS"
-	  LIBS="$SAVE_LIBS"
+      if test "$uuid_links" = "no"; then
+        AC_MSG_ERROR([could not compile a test libuuid program])
+      fi
+    fi
 
-          if test "$uuid_links" = "no"; then
-             AC_MSG_ERROR([could not compile a test libuuid program])
-          fi
-       fi
-       AC_SUBST(UUID_CPPFLAGS)
-       AC_SUBST(UUID_LIBS)
-       with_uuid=yes
-   fi
+    CPPFLAGS="$SAVE_CPPFLAGS"
+    LIBS="$SAVE_LIBS"
+
+    AC_SUBST(UUID_CPPFLAGS)
+    AC_SUBST(UUID_LIBS)
+    with_uuid=yes
+  fi
 else
    AC_MSG_ERROR([no libuuid libraries or includes found])
 fi
