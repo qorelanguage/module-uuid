@@ -52,7 +52,7 @@ doxygen-doc:
 endif
 
 mostlyclean-local:
-	rm -rf ${DOXYGEN_OUTPUT} ${DX_CLEANFILES}
+	$(RM) -rf ${DOXYGEN_OUTPUT} ${DX_CLEANFILES}
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck

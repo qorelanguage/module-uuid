@@ -56,7 +56,7 @@ typedef char* uuid_string_t;
 #ifdef WIN_UUID
 typedef UUID q_uuid_t;
 #else
-#ifdef OSSP_UUID
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
 typedef uuid_t* q_uuid_t;
 #else
 typedef uuid_t q_uuid_t;
@@ -89,8 +89,8 @@ protected:
       else
          str->tolwr();
 #else // WIN_UUID
-#ifdef OSSP_UUID
-      char *buf = 0;
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
+      char* buf = nullptr;
       size_t len = 0;
 #ifdef DEBUG
       uuid_rc_t rc = uuid_export(uuid, UUID_FMT_STR, &buf, &len);
@@ -133,7 +133,7 @@ protected:
 #ifdef WIN_UUID
       UuidCreate(&uuid);
 #else
-#ifdef OSSP_UUID
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       if (flags & QUF_TIME)
          uuid_make(uuid, UUID_MAKE_V1);
       else if (!(flags & QUF_EMPTY))
@@ -154,14 +154,22 @@ protected:
 public:
    DLLLOCAL QoreUUID(int flags = QUF_NONE) {
 #ifdef OSSP_UUID
+#ifdef OSSP_UUID_CREATE
       uuid_create(&uuid);
+#else
+      uuid_generate(uuid);
+#endif
 #endif
       generateIntern(uuid, flags);
    }
 
    DLLLOCAL QoreUUID(const QoreString &uuid_str, ExceptionSink *xsink) {
 #ifdef OSSP_UUID
+#ifdef OSSP_UUID_CREATE
       uuid_create(&uuid);
+#else
+      uuid_generate(uuid);
+#endif
 #endif
       set(uuid_str, xsink);
    }
@@ -171,7 +179,7 @@ public:
       // FIXME: test
       memcpy(&uuid, &old.uuid, sizeof(UUID));
 #else
-#ifdef OSSP_UUID
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       uuid_create(&uuid);
       uuid_clone(old.uuid, &uuid);
 #else
@@ -180,7 +188,7 @@ public:
 #endif
    }
 
-#ifdef OSSP_UUID
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
    DLLLOCAL ~QoreUUID() {
       uuid_destroy(uuid);
    }
@@ -211,7 +219,7 @@ public:
       xsink->raiseException("UUID-STRING-ERROR", getErrorString(xsink, uuid_str));
       return -1;
 #else
-#ifdef OSSP_UUID
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       uuid_rc_t rc = uuid_import(uuid, UUID_FMT_STR, uuid_str.getBuffer(), uuid_str.strlen());
       if (rc == UUID_RC_OK)
          return 0;
@@ -238,7 +246,7 @@ public:
       UuidIsNil((UUID *)&uuid, &rc);
       return rc;
 #else
-#ifdef OSSP_UUID
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       int result;
       uuid_isnil(uuid, &result);
       return result;
@@ -252,9 +260,13 @@ public:
 #ifdef WIN_UUID
       UuidCreateNil(&uuid);
 #else
-#ifdef OSSP_UUID
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       uuid_destroy(uuid);
+#ifdef OSSP_UUID_CREATE
       uuid_create(&uuid);
+#else
+      uuid_generate(uuid);
+#endif
 #else
       uuid_clear(uuid);
 #endif
@@ -267,7 +279,7 @@ public:
       UuidCompare((UUID*)&uuid, (UUID*)&other.uuid, &rc);
       return rc;
 #else
-#ifdef OSSP_UUID
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       int result;
       uuid_compare(uuid, other.uuid, &result);
       return result;
@@ -279,7 +291,7 @@ public:
 
    DLLLOCAL static QoreStringNode *get(int string_flags = QUF_NONE, int gen_flags = QUF_NONE) {
       q_uuid_t uuid;
-#ifdef OSSP_UUID
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       uuid_create(&uuid);
 #endif
       generateIntern(uuid, gen_flags);
