@@ -2,7 +2,7 @@
 /*
   uuid Qore module
 
-  Copyright (C) 2010 - 2016 David Nichols
+  Copyright (C) 2010 - 2021 David Nichols
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ DLLEXPORT char qore_module_license_str[] = "MIT";
 
 DLLLOCAL QoreClass* initUUIDClass(QoreNamespace &ns);
 
-QoreNamespace UNS("UUID");
+QoreNamespace UNS("Qore::UUID");
 
 QoreStringNode *uuid_module_init() {
    // setup namespace
