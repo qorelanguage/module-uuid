@@ -505,7 +505,7 @@ UUID uuid; UuidCreate(&uuid);
         UUID_LIBS="-luuid"
       fi
     fi
-    
+
     # check for uuid_unparse_upper() and uuid_unparse_lower()
     AC_MSG_CHECKING([for uuid_unparse_upper() and uuid_unparse_lower()])
     uuid_ul="`grep -e uuid_unparse_upper -e uuid_unparse_lower $with_uuid_includes/uuid.h 2>/dev/null`"
@@ -618,7 +618,7 @@ find_qore() {
 
     AC_MSG_CHECKING([for qore include files])
     # try to find include files
-    if test "$a" = "/"; then
+    if test "$a" = "/" -o -z "$a" ; then
         inc=/usr/include
     else
         inc=$a/include
