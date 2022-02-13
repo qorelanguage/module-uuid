@@ -59,7 +59,7 @@ set(QORE_DOX_TMPL_SRC
 
 add_library(${module_name} MODULE ${QPP_SOURCES} ${CPP_SRC})
 
-qore_binary_module(${module_name} "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ${UUID_LIBRARY})
+qore_external_binary_module(${module_name} "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ${UUID_LIBRARY})
 qore_user_modules("${QMOD}")
 
 qore_dist("${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
