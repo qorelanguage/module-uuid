@@ -6,8 +6,7 @@ set (VERSION_MAJOR 1)
 set (VERSION_MINOR 4)
 set (VERSION_PATCH 0)
 
-
-find_package(Qore 0.9 REQUIRED)
+find_package(Qore 1.0 REQUIRED)
 
 include_directories( ${CMAKE_SOURCE_DIR}/src )
 
@@ -23,18 +22,25 @@ endif()
 find_path(UUID_INCLUDE_DIR uuid.h PATH_SUFFIXES uuid ossp)
 
 include(CheckFunctionExists)
-# Some systems include uuid automatically (OS X), others need the includes/library
-check_function_exists (uuid_unparse_lower HAVE_UUID)
-if (NOT HAVE_UUID)
-    message ("-- Looking for libuuid")
-    find_library(UUID_LIBRARY NAMES uuid)
-    if (UUID_INCLUDE_DIR AND UUID_LIBRARY)
-        message ("-- Found libuuid: ${UUID_LIBRARY}")
-        set (HAVE_UUID true)
-    else (UUID_INCLUDE_DIR AND UUID_LIBRARY)
-        message(FATAL_ERROR "no libuuid found")
-    endif (UUID_INCLUDE_DIR AND UUID_LIBRARY)
-endif (NOT HAVE_UUID)
+
+if (WIN32 OR MSYS OR MINGW)
+    set(CMAKE_REQUIRED_LINK_OPTIONS -lrpcrt4)
+    set(CMAKE_REQUIRED_HEADERS "windows.h")
+    set(CMAKE_SYSTEM_NAME Generic)
+else()
+    # Some systems include uuid automatically (OS X), others need the includes/library
+    check_function_exists(uuid_unparse_lower HAVE_UUID)
+    if (NOT HAVE_UUID)
+        message ("-- Looking for libuuid")
+        find_library(UUID_LIBRARY NAMES uuid)
+        if (UUID_INCLUDE_DIR AND UUID_LIBRARY)
+            message ("-- Found libuuid: ${UUID_LIBRARY}")
+            set (HAVE_UUID true)
+        else (UUID_INCLUDE_DIR AND UUID_LIBRARY)
+            message(FATAL_ERROR "no libuuid found")
+        endif (UUID_INCLUDE_DIR AND UUID_LIBRARY)
+    endif (NOT HAVE_UUID)
+endif()
 
 include_directories(${UUID_INCLUDE_DIR})
 
