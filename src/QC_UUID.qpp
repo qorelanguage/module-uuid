@@ -24,7 +24,7 @@
 
 /** @defgroup uuid_generation_constants UUID Generation Constants
  */
-//@{
+///@{
 namespace Qore::UUID;
 //! No value; this is the default
 const None = QUF_NONE;
@@ -40,18 +40,18 @@ const Empty = QUF_EMPTY;
 
 //! If case is supported in the UUID::toString() method; this is always True
 const HAVE_UNPARSE_CASE = True;
-//@}
+///@}
 
 /** @defgroup uuid_formatting_constants UUID Formatting Constants
  */
 namespace Qore::UUID;
-//@{
+///@{
 //! All alphebetic hexadecimal characters will be in upper case
 const UpperCase = QUF_UPPER_CASE;
 
 //! All alphebetic hexadecimal characters will be in lower case; this is the default
 const LowerCase = QUF_LOWER_CASE;
-//@}
+///@}
 
 //! The UUID class provides methods that allow UUIDs to be created, manipulated, and parsed
 /** 
