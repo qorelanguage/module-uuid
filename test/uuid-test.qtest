@@ -2,7 +2,6 @@
 
 %requires uuid >= 1.1
 
-# the uuid module requires qore 0.8.0+, so we know we have types
 %require-types
 %new-style
 %strict-args
@@ -10,9 +9,9 @@
 
 %requires QUnit
 
-%exec-class uuid_test
+%exec-class UuidTestd
 
-class uuid_test inherits QUnit::Test {
+class UuidTestd inherits QUnit::Test {
     constructor() : Test("uuid", "1.0") {
         addTestCase("default", \defaultTest());
         addTestCase("random", \randomTest());

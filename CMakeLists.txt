@@ -4,7 +4,7 @@ project(qore-uuid-module)
 
 set (VERSION_MAJOR 1)
 set (VERSION_MINOR 4)
-set (VERSION_PATCH 0)
+set (VERSION_PATCH 1)
 
 find_package(Qore 1.0 REQUIRED)
 
