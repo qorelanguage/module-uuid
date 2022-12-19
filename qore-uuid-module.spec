@@ -1,4 +1,4 @@
-%define mod_ver 1.4
+%define mod_ver 1.4.1
 %define module_api %(qore --latest-module-api 2>/dev/null)
 %define module_dir %{_libdir}/qore-modules
 
@@ -14,10 +14,8 @@
 # get *suse release minor version without trailing zeros
 %define os_min %(echo %suse_version|rev|cut -b-2|rev|sed s/0*$//)
 
-%if %suse_version > 1010
+%if %suse_version
 %define dist .opensuse%{os_maj}_%{os_min}
-%else
-%define dist .suse%{os_maj}_%{os_min}
 %endif
 
 %endif
@@ -37,18 +35,23 @@ Summary: UUID module for Qore
 Name: qore-uuid-module
 Version: %{mod_ver}
 Release: 1%{dist}
-License: LGPL
-Group: Development/Languages
+License: LGPL-2.1-or-later
+Group: Development/Languages/Other
 URL: http://qore.org
 Source: http://prdownloads.sourceforge.net/qore/%{name}-%{version}.tar.bz2
-#Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: /usr/bin/env
 Requires: qore-module(abi)%{?_isa} = %{module_api}
+%if 0%{?el7}
+BuildRequires:  devtoolset-7-gcc-c++
+%endif
+BuildRequires: cmake >= 3.5
 BuildRequires: gcc-c++
-BuildRequires: qore-devel >= 0.9
+BuildRequires: qore-devel >= 1.12.4
+BuildRequires: qore-stdlib >= 1.12.4
+BuildRequires: qore >= 1.12.4
 BuildRequires: libuuid-devel
-BuildRequires: qore
+BuildRequires: doxygen
 
 %description
 This package contains the uuid module for the Qore Programming Language.
@@ -61,7 +64,7 @@ UUIDs are universally unique identifiers that can be used for any purpose.
 
 %package doc
 Summary: Documentation and examples for the Qore UUID module
-Group: Development/Languages
+Group: Development/Languages/Other
 
 %description doc
 This package contains the HTML documentation and example programs for the Qore
@@ -73,16 +76,20 @@ uuid module.
 
 %prep
 %setup -q
-./configure RPM_OPT_FLAGS="$RPM_OPT_FLAGS" --prefix=/usr --disable-debug
 
 %build
-%{__make}
+%if 0%{?el7}
+# enable devtoolset7
+. /opt/rh/devtoolset-7/enable
+%endif
+export CXXFLAGS="%{?optflags}"
+cmake -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_BUILD_TYPE=RELWITHDEBINFO -DCMAKE_SKIP_RPATH=1 -DCMAKE_SKIP_INSTALL_RPATH=1 -DCMAKE_SKIP_BUILD_RPATH=1 -DCMAKE_PREFIX_PATH=${_prefix}/lib64/cmake/Qore .
+make %{?_smp_mflags}
+make %{?_smp_mflags} docs
+sed -i 's/#!\/usr\/bin\/env qore/#!\/usr\/bin\/qore/' test/*.qtest
 
 %install
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/%{module_dir}
-mkdir -p $RPM_BUILD_ROOT/usr/share/doc/qore-uuid-module
-make install DESTDIR=$RPM_BUILD_ROOT
+make DESTDIR=%{buildroot} install %{?_smp_mflags}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -92,7 +99,14 @@ rm -rf $RPM_BUILD_ROOT
 %{module_dir}
 %doc COPYING.MIT COPYING.LGPL README RELEASE-NOTES AUTHORS
 
+%check
+qore -l ./uuid-api-1.3.qmod test/uuid-test.qtest -v
+
 %changelog
+* Mon Dec 19 2022 David Nichols <david@qore.org> 1.4.1
+- updated version to 1.4.1
+- use cmake instead of autotools for the build
+
 * Tue May 1 2018 David Nichols <david@qore.org> 1.4
 - updated version to 1.4
 
