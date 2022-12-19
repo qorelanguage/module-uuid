@@ -39,7 +39,6 @@ License: LGPL-2.1-or-later
 Group: Development/Languages/Other
 URL: http://qore.org
 Source: http://prdownloads.sourceforge.net/qore/%{name}-%{version}.tar.bz2
-#Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: /usr/bin/env
 Requires: qore-module(abi)%{?_isa} = %{module_api}
