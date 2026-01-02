@@ -7,6 +7,8 @@ bug fixes:
 * fixed Windows compare() implementation to return comparison result
 * fixed memory leak in static UUID::get() for OSSP UUID library
 * fixed configure macro mismatch for HAVE_UUID_UNPARSE_CASE
+
+other changes:
 * updated minimum Qore version requirement to 0.9
 * improved test coverage with negative tests and corner cases
 * updated GitLab CI configuration
