@@ -30,3 +30,5 @@ src/*.dox.h
 src/qc_*.cpp
 src/ql_*.cpp
 src/QC_*.cpp
+src/QC_*.qtest
+docs/*.tag
