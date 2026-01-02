@@ -45,13 +45,13 @@
 typedef char* uuid_string_t;
 #endif
 
-// uuid flags
+// uuid flags (bit flags - must be powers of 2)
 #define QUF_NONE        0
 #define QUF_UPPER_CASE  1
 #define QUF_LOWER_CASE  2
-#define QUF_RANDOM      3
-#define QUF_TIME        4
-#define QUF_EMPTY       5
+#define QUF_RANDOM      4
+#define QUF_TIME        8
+#define QUF_EMPTY       16
 
 #ifdef WIN_UUID
 typedef UUID q_uuid_t;
@@ -243,8 +243,7 @@ public:
    DLLLOCAL bool isNull() const {
 #ifdef WIN_UUID
       RPC_STATUS rc;
-      UuidIsNil((UUID *)&uuid, &rc);
-      return rc;
+      return UuidIsNil((UUID *)&uuid, &rc);
 #else
 #if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       int result;
@@ -276,8 +275,7 @@ public:
    DLLLOCAL int compare(const QoreUUID &other) const {
 #ifdef WIN_UUID
       RPC_STATUS rc;
-      UuidCompare((UUID*)&uuid, (UUID*)&other.uuid, &rc);
-      return rc;
+      return UuidCompare((UUID*)&uuid, (UUID*)&other.uuid, &rc);
 #else
 #if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       int result;
@@ -295,7 +293,11 @@ public:
       uuid_create(&uuid);
 #endif
       generateIntern(uuid, gen_flags);
-      return getStringIntern(uuid, string_flags);
+      QoreStringNode* rv = getStringIntern(uuid, string_flags);
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
+      uuid_destroy(uuid);
+#endif
+      return rv;
    }
 };
 

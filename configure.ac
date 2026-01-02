@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # AC_PREREQ(2.59)
-AC_INIT([qore-uuid-module], [1.4.1],
+AC_INIT([qore-uuid-module], [1.4.2],
         [David Nichols <david@qore.org>],
         [qore-uuid-module])
 AM_INIT_AUTOMAKE([no-dist-gzip dist-bzip2])
@@ -510,7 +510,7 @@ UUID uuid; UuidCreate(&uuid);
     AC_MSG_CHECKING([for uuid_unparse_upper() and uuid_unparse_lower()])
     uuid_ul="`grep -e uuid_unparse_upper -e uuid_unparse_lower $with_uuid_includes/uuid.h 2>/dev/null`"
     if test -n "$uuid_ul"; then
-      AC_DEFINE(HAS_UUID_UNPARSE_CASE, 1, [if uuid_unparse_lower() and uuid_unparse_upper() are available])
+      AC_DEFINE(HAVE_UUID_UNPARSE_CASE, 1, [if uuid_unparse_lower() and uuid_unparse_upper() are available])
       AC_MSG_RESULT([yes])
     else
       AC_MSG_RESULT([no])
