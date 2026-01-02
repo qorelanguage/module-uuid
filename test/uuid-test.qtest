@@ -9,15 +9,22 @@
 
 %requires QUnit
 
-%exec-class UuidTestd
+%exec-class UuidTest
 
-class UuidTestd inherits QUnit::Test {
+class UuidTest inherits QUnit::Test {
     constructor() : Test("uuid", "1.0") {
-        addTestCase("default", \defaultTest());
-        addTestCase("random", \randomTest());
-        addTestCase("time", \timeTest());
-        addTestCase("literal", \literalTest());
-        addTestCase("parsed", \parsedTest());
+        addTestCase("default generation", \defaultTest());
+        addTestCase("random generation", \randomTest());
+        addTestCase("time-based generation", \timeTest());
+        addTestCase("literal UUID", \literalTest());
+        addTestCase("parsed UUID", \parsedTest());
+        addTestCase("empty UUID", \emptyTest());
+        addTestCase("static get", \staticGetTest());
+        addTestCase("UUID format validation", \formatTest());
+        addTestCase("copy functionality", \copyTest());
+        addTestCase("compare functionality", \compareTest());
+        addTestCase("negative tests", \negativeTest());
+        addTestCase("corner cases", \cornerCaseTest());
 
         set_return_value(main());
     }
@@ -42,6 +49,10 @@ class UuidTestd inherits QUnit::Test {
     literalTest() {
         UUID uuid("1b4e28ba-2fa1-11d2-883f-b9a761bde3fb");
         doTests(uuid, "literal");
+
+        # verify the literal value is preserved
+        string str = uuid.toString(UUID::LowerCase);
+        assertEq("1b4e28ba-2fa1-11d2-883f-b9a761bde3fb", str, "literal UUID preserved");
     }
 
     parsedTest() {
@@ -53,12 +64,195 @@ class UuidTestd inherits QUnit::Test {
         doTests(uuid, "parsed");
     }
 
+    emptyTest() {
+        # Test creating UUID with Empty flag
+        UUID uuid(UUID::Empty);
+        assertTrue(uuid.isNull(), "UUID with Empty flag is null");
+        assertEq("00000000-0000-0000-0000-000000000000", uuid.toString(UUID::LowerCase), "Empty UUID string");
+
+        # Test generate with Empty flag
+        UUID uuid2();
+        assertFalse(uuid2.isNull(), "Generated UUID is not null");
+        uuid2.generate(UUID::Empty);
+        assertTrue(uuid2.isNull(), "UUID after generate(Empty) is null");
+    }
+
+    staticGetTest() {
+        # Test static get() method
+        string str = UUID::get();
+        assertEq(36, str.length(), "UUID string length");
+        assertTrue(str =~ /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+            "UUID format lowercase");
+
+        # Test with uppercase flag
+        string strUpper = UUID::get(UUID::UpperCase);
+        assertEq(36, strUpper.length(), "UUID uppercase string length");
+        assertTrue(strUpper =~ /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/,
+            "UUID format uppercase");
+
+        # Test with generation flags
+        string strRandom = UUID::get(UUID::LowerCase, UUID::Random);
+        assertEq(36, strRandom.length(), "UUID random string length");
+
+        string strTime = UUID::get(UUID::LowerCase, UUID::Time);
+        assertEq(36, strTime.length(), "UUID time string length");
+    }
+
+    formatTest() {
+        UUID uuid();
+        string lower = uuid.toString(UUID::LowerCase);
+        string upper = uuid.toString(UUID::UpperCase);
+
+        # Check format: 8-4-4-4-12
+        assertEq(36, lower.length(), "UUID length");
+        assertEq("-", lower[8], "First hyphen position");
+        assertEq("-", lower[13], "Second hyphen position");
+        assertEq("-", lower[18], "Third hyphen position");
+        assertEq("-", lower[23], "Fourth hyphen position");
+
+        # Check case consistency
+        assertTrue(lower =~ /^[0-9a-f\-]+$/, "Lowercase contains only lowercase hex");
+        assertTrue(upper =~ /^[0-9A-F\-]+$/, "Uppercase contains only uppercase hex");
+
+        # Verify they represent the same UUID (case insensitive comparison)
+        assertEq(lower.lwr(), upper.lwr(), "Upper and lower represent same UUID");
+    }
+
+    copyTest() {
+        UUID original("1b4e28ba-2fa1-11d2-883f-b9a761bde3fb");
+        UUID copied = original.copy();
+
+        # Verify copy is equal
+        assertEq(0, original.compare(copied), "Copy equals original");
+        assertEq(original.toString(), copied.toString(), "Copy string equals original");
+
+        # Verify copy is independent
+        copied.clear();
+        assertFalse(original.isNull(), "Original unaffected by clearing copy");
+        assertTrue(copied.isNull(), "Copy is now null");
+        assertNeq(0, original.compare(copied), "Original and cleared copy are different");
+    }
+
+    compareTest() {
+        UUID nil(UUID::Empty);
+        UUID max();
+        max.set("ffffffff-ffff-ffff-ffff-ffffffffffff");
+
+        UUID mid();
+        mid.set("80000000-0000-0000-0000-000000000000");
+
+        # Nil < mid < max
+        assertEq(-1, nil.compare(mid), "nil < mid");
+        assertEq(-1, nil.compare(max), "nil < max");
+        assertEq(-1, mid.compare(max), "mid < max");
+
+        assertEq(1, mid.compare(nil), "mid > nil");
+        assertEq(1, max.compare(nil), "max > nil");
+        assertEq(1, max.compare(mid), "max > mid");
+
+        # Equal comparisons
+        assertEq(0, nil.compare(nil.copy()), "nil equals nil copy");
+        assertEq(0, max.compare(max.copy()), "max equals max copy");
+
+        # Self comparison
+        assertEq(0, mid.compare(mid), "UUID equals itself");
+    }
+
+    negativeTest() {
+        # Test invalid UUID strings
+        list<string> invalidUuids = (
+            "",                                          # empty string
+            "not-a-uuid",                               # invalid format
+            "1b4e28ba-2fa1-11d2-883f",                  # too short
+            "1b4e28ba-2fa1-11d2-883f-b9a761bde3fb-abc", # too long
+            "1b4e28ba2fa111d2883fb9a761bde3fb",         # missing hyphens
+            "1b4e28ba-2fa1-11d2-883f-b9a761bde3fX",     # invalid character
+            "gggggggg-gggg-gggg-gggg-gggggggggggg",     # invalid hex
+            "1b4e28ba-2fa1-11d2-883f-b9a761bde3f",      # one char short
+            "1b4e28ba-2fa1-11d2-883fb9a761bde3fb-",     # wrong hyphen position
+        );
+
+        foreach string invalid in (invalidUuids) {
+            bool thrown = False;
+            try {
+                UUID uuid(invalid);
+            } catch (hash<ExceptionInfo> ex) {
+                thrown = True;
+                assertEq("UUID-STRING-ERROR", ex.err,
+                    sprintf("Expected UUID-STRING-ERROR for: '%s'", invalid));
+            }
+            assertTrue(thrown, sprintf("Exception expected for invalid UUID: '%s'", invalid));
+        }
+
+        # Test set() with invalid strings
+        UUID uuid();
+        foreach string invalid in (invalidUuids) {
+            bool thrown = False;
+            try {
+                uuid.set(invalid);
+            } catch (hash<ExceptionInfo> ex) {
+                thrown = True;
+                assertEq("UUID-STRING-ERROR", ex.err,
+                    sprintf("Expected UUID-STRING-ERROR for set(): '%s'", invalid));
+            }
+            assertTrue(thrown, sprintf("Exception expected for set() with invalid UUID: '%s'", invalid));
+        }
+    }
+
+    cornerCaseTest() {
+        # Test nil UUID
+        UUID nil(UUID::Empty);
+        assertEq("00000000-0000-0000-0000-000000000000", nil.toString(UUID::LowerCase), "Nil UUID");
+        assertTrue(nil.isNull(), "Nil UUID isNull() returns true");
+
+        # Test maximum UUID
+        UUID max();
+        max.set("ffffffff-ffff-ffff-ffff-ffffffffffff");
+        assertEq("ffffffff-ffff-ffff-ffff-ffffffffffff", max.toString(UUID::LowerCase), "Max UUID");
+        assertFalse(max.isNull(), "Max UUID isNull() returns false");
+
+        # Test case insensitivity in parsing
+        UUID upper("1B4E28BA-2FA1-11D2-883F-B9A761BDE3FB");
+        UUID lower("1b4e28ba-2fa1-11d2-883f-b9a761bde3fb");
+        assertEq(0, upper.compare(lower), "UUID parsing is case insensitive");
+
+        # Test mixed case parsing
+        UUID mixed("1B4e28Ba-2fA1-11D2-883f-B9a761bDe3Fb");
+        assertEq(0, mixed.compare(lower), "Mixed case UUID parsing");
+
+        # Test multiple generations don't produce the same UUID (probabilistic)
+        list<string> uuids = ();
+        for (int i = 0; i < 100; i++) {
+            uuids += UUID::get();
+        }
+        hash<string, bool> seen;
+        foreach string u in (uuids) {
+            assertFalse(seen{u} ?? False, "UUID collision detected");
+            seen{u} = True;
+        }
+
+        # Test clear and regenerate
+        UUID uuid();
+        string original = uuid.toString();
+        uuid.clear();
+        assertTrue(uuid.isNull(), "UUID is null after clear");
+        uuid.generate();
+        assertFalse(uuid.isNull(), "UUID is not null after regenerate");
+        # Note: theoretically could be the same, but probability is negligible
+        assertNeq(original, uuid.toString(), "Regenerated UUID is different");
+
+        # Test HAVE_UNPARSE_CASE constant
+        assertTrue(UUID::HAVE_UNPARSE_CASE, "HAVE_UNPARSE_CASE is True");
+    }
+
     doTests(UUID uuid, string type) {
         assertFalse(uuid.isNull(), sprintf("UUID::isNull, type: %s", type));
 
         if (UUID::HAVE_UNPARSE_CASE) {
-            assertTrue(uuid.toString(UUID::LowerCase) =~ /^[\-0-9a-f]+$/, sprintf("UUID::toString(LowerCase), type: %s", type));
-            assertTrue(uuid.toString(UUID::UpperCase) =~ /^[\-0-9A-F]+$/, sprintf("UUID::toString(UpperCase), type: %s", type));
+            assertTrue(uuid.toString(UUID::LowerCase) =~ /^[\-0-9a-f]+$/,
+                sprintf("UUID::toString(LowerCase), type: %s", type));
+            assertTrue(uuid.toString(UUID::UpperCase) =~ /^[\-0-9A-F]+$/,
+                sprintf("UUID::toString(UpperCase), type: %s", type));
         }
 
         UUID other = uuid.copy();

@@ -23,7 +23,7 @@ See COPYING.MIT and COPYING.LGPL for details on the open-source licenses.
 
 BUILDING
 --------
-Requires qore 0.8.0+ and libuuid to build and run
+Requires qore 0.9+ and libuuid to build and run
 
 to configure the build, execute
    	configure --disable-debug

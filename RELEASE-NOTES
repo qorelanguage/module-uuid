@@ -1,3 +1,28 @@
+*************
+version 1.4.2
+*************
+
+bug fixes:
+* fixed Windows isNull() implementation to return correct result
+* fixed Windows compare() implementation to return comparison result
+* fixed memory leak in static UUID::get() for OSSP UUID library
+* fixed configure macro mismatch for HAVE_UUID_UNPARSE_CASE
+* updated minimum Qore version requirement to 0.9
+* improved test coverage with negative tests and corner cases
+* updated GitLab CI configuration
+
+*************
+version 1.4.1
+*************
+
+updated to build with qpp from Qore 1.12.4+
+
+***********
+version 1.4
+***********
+
+updated to build with the latest Qore APIs
+
 ***********
 version 1.3
 ***********

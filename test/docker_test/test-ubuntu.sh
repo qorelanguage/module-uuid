@@ -43,4 +43,4 @@ chown -R qore:qore ${MODULE_SRC_DIR}
 # run the tests
 export QORE_MODULE_DIR=${MODULE_SRC_DIR}/qlib:${QORE_MODULE_DIR}
 cd ${MODULE_SRC_DIR}
-gosu qore:qore qore test/uuid-test.q -vv
+gosu qore:qore qore test/uuid-test.qtest -vv

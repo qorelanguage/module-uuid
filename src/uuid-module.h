@@ -243,8 +243,7 @@ public:
    DLLLOCAL bool isNull() const {
 #ifdef WIN_UUID
       RPC_STATUS rc;
-      UuidIsNil((UUID *)&uuid, &rc);
-      return rc;
+      return UuidIsNil((UUID *)&uuid, &rc);
 #else
 #if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       int result;
@@ -276,8 +275,7 @@ public:
    DLLLOCAL int compare(const QoreUUID &other) const {
 #ifdef WIN_UUID
       RPC_STATUS rc;
-      UuidCompare((UUID*)&uuid, (UUID*)&other.uuid, &rc);
-      return rc;
+      return UuidCompare((UUID*)&uuid, (UUID*)&other.uuid, &rc);
 #else
 #if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
       int result;
@@ -295,7 +293,11 @@ public:
       uuid_create(&uuid);
 #endif
       generateIntern(uuid, gen_flags);
-      return getStringIntern(uuid, string_flags);
+      QoreStringNode* rv = getStringIntern(uuid, string_flags);
+#if defined(OSSP_UUID) && defined(OSSP_UUID_CREATE)
+      uuid_destroy(uuid);
+#endif
+      return rv;
    }
 };
 
