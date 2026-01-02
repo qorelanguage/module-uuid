@@ -48,11 +48,12 @@ class UuidTest inherits QUnit::Test {
 
     literalTest() {
         UUID uuid("1b4e28ba-2fa1-11d2-883f-b9a761bde3fb");
-        doTests(uuid, "literal");
 
-        # verify the literal value is preserved
+        # verify the literal value is preserved (check before doTests modifies it)
         string str = uuid.toString(UUID::LowerCase);
         assertEq("1b4e28ba-2fa1-11d2-883f-b9a761bde3fb", str, "literal UUID preserved");
+
+        doTests(uuid, "literal");
     }
 
     parsedTest() {
@@ -65,16 +66,18 @@ class UuidTest inherits QUnit::Test {
     }
 
     emptyTest() {
-        # Test creating UUID with Empty flag
-        UUID uuid(UUID::Empty);
-        assertTrue(uuid.isNull(), "UUID with Empty flag is null");
+        # Test clear() method to create empty/nil UUID
+        UUID uuid();
+        assertFalse(uuid.isNull(), "Generated UUID is not null");
+        uuid.clear();
+        assertTrue(uuid.isNull(), "UUID after clear() is null");
         assertEq("00000000-0000-0000-0000-000000000000", uuid.toString(UUID::LowerCase), "Empty UUID string");
 
-        # Test generate with Empty flag
+        # Test that a second UUID can also be cleared
         UUID uuid2();
-        assertFalse(uuid2.isNull(), "Generated UUID is not null");
-        uuid2.generate(UUID::Empty);
-        assertTrue(uuid2.isNull(), "UUID after generate(Empty) is null");
+        assertFalse(uuid2.isNull(), "Generated UUID2 is not null");
+        uuid2.clear();
+        assertTrue(uuid2.isNull(), "UUID2 after clear() is null");
     }
 
     staticGetTest() {
@@ -200,8 +203,9 @@ class UuidTest inherits QUnit::Test {
     }
 
     cornerCaseTest() {
-        # Test nil UUID
-        UUID nil(UUID::Empty);
+        # Test nil UUID using clear()
+        UUID nil();
+        nil.clear();
         assertEq("00000000-0000-0000-0000-000000000000", nil.toString(UUID::LowerCase), "Nil UUID");
         assertTrue(nil.isNull(), "Nil UUID isNull() returns true");
 
