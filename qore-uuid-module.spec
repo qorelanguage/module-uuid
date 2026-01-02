@@ -1,4 +1,4 @@
-%define mod_ver 1.4.1
+%define mod_ver 1.4.2
 %define module_api %(qore --latest-module-api 2>/dev/null)
 %define module_dir %{_libdir}/qore-modules
 
@@ -100,9 +100,15 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING.MIT COPYING.LGPL README RELEASE-NOTES AUTHORS
 
 %check
-qore -l ./uuid-api-1.3.qmod test/uuid-test.qtest -v
+qore -l ./uuid-api-%{module_api}.qmod test/uuid-test.qtest -v
 
 %changelog
+* Thu Jan 2 2026 David Nichols <david@qore.org> 1.4.2
+- updated to version 1.4.2
+- fixed Windows isNull() and compare() implementations
+- fixed memory leak in static UUID::get() for OSSP UUID
+- fixed UUID generation flags to use proper bit flags
+
 * Mon Dec 19 2022 David Nichols <david@qore.org> 1.4.1
 - updated version to 1.4.1
 - use cmake instead of autotools for the build

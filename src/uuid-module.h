@@ -45,13 +45,13 @@
 typedef char* uuid_string_t;
 #endif
 
-// uuid flags
+// uuid flags (bit flags - must be powers of 2)
 #define QUF_NONE        0
 #define QUF_UPPER_CASE  1
 #define QUF_LOWER_CASE  2
-#define QUF_RANDOM      3
-#define QUF_TIME        4
-#define QUF_EMPTY       5
+#define QUF_RANDOM      4
+#define QUF_TIME        8
+#define QUF_EMPTY       16
 
 #ifdef WIN_UUID
 typedef UUID q_uuid_t;

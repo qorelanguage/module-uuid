@@ -66,14 +66,14 @@ class UuidTest inherits QUnit::Test {
     }
 
     emptyTest() {
-        # Test clear() method to create empty/nil UUID
+        # Test generate with Empty flag
         UUID uuid();
         assertFalse(uuid.isNull(), "Generated UUID is not null");
-        uuid.clear();
-        assertTrue(uuid.isNull(), "UUID after clear() is null");
+        uuid.generate(UUID::Empty);
+        assertTrue(uuid.isNull(), "UUID after generate(Empty) is null");
         assertEq("00000000-0000-0000-0000-000000000000", uuid.toString(UUID::LowerCase), "Empty UUID string");
 
-        # Test that a second UUID can also be cleared
+        # Test clear() method
         UUID uuid2();
         assertFalse(uuid2.isNull(), "Generated UUID2 is not null");
         uuid2.clear();
@@ -203,9 +203,9 @@ class UuidTest inherits QUnit::Test {
     }
 
     cornerCaseTest() {
-        # Test nil UUID using clear()
+        # Test nil UUID using generate(Empty)
         UUID nil();
-        nil.clear();
+        nil.generate(UUID::Empty);
         assertEq("00000000-0000-0000-0000-000000000000", nil.toString(UUID::LowerCase), "Nil UUID");
         assertTrue(nil.isNull(), "Nil UUID isNull() returns true");
 
