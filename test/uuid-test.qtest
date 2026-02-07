@@ -2,10 +2,7 @@
 
 %requires uuid >= 1.1
 
-%require-types
-%new-style
-%strict-args
-%enable-all-warnings
+%modern
 
 %requires QUnit
 
