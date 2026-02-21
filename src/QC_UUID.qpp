@@ -170,9 +170,7 @@ int rc = uuid.compare(other_uuid);
     @endcode
  */
 int UUID::compare(UUID[QoreUUID] other) [flags=CONSTANT] {
-   SimpleRefHolder<QoreUUID> holder(other);
-
-   return uuid->compare(*other);
+   return uuid->compare(**other);
 }
 
 //! sets the UUID from the given string
