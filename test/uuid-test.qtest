@@ -15,6 +15,7 @@ class UuidTest inherits QUnit::Test {
         addTestCase("time-based generation", \timeTest());
         addTestCase("literal UUID", \literalTest());
         addTestCase("parsed UUID", \parsedTest());
+        addTestCase("named argument calls", \namedArgumentTest());
         addTestCase("empty UUID", \emptyTest());
         addTestCase("static get", \staticGetTest());
         addTestCase("UUID format validation", \formatTest());
@@ -60,6 +61,28 @@ class UuidTest inherits QUnit::Test {
         string str2 = uuid.toString();
         assertEq(str, str2, sprintf("static UUID::get(), type: %s", "parsed"));
         doTests(uuid, "parsed");
+    }
+
+    namedArgumentTest() {
+        UUID nil(flags: UUID::Empty);
+        assertTrue(nil.isNull(), "named constructor flags");
+
+        UUID uuid(uuid_string: "1b4e28ba-2fa1-11d2-883f-b9a761bde3fb");
+        assertEq("1B4E28BA-2FA1-11D2-883F-B9A761BDE3FB",
+            uuid.toString(format: UUID::UpperCase), "named toString format");
+
+        uuid.set(uuid_string: "ffffffff-ffff-ffff-ffff-ffffffffffff");
+        assertEq("ffffffff-ffff-ffff-ffff-ffffffffffff",
+            uuid.toString(format: UUID::LowerCase), "named set UUID string");
+        assertEq(1, uuid.compare(other: nil), "named compare");
+
+        uuid.generate(flags: UUID::Empty);
+        assertTrue(uuid.isNull(), "named generate flags");
+
+        string generated = UUID::get(flags: UUID::Random, format: UUID::UpperCase);
+        assertEq(36, generated.length(), "named static get length");
+        assertTrue(generated =~ /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/,
+            "named static get uppercase format");
     }
 
     emptyTest() {
