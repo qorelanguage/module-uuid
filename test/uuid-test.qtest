@@ -128,10 +128,10 @@ class UuidTest inherits QUnit::Test {
 
         # Check format: 8-4-4-4-12
         assertEq(36, lower.length(), "UUID length");
-        assertEq("-", lower[8], "First hyphen position");
-        assertEq("-", lower[13], "Second hyphen position");
-        assertEq("-", lower[18], "Third hyphen position");
-        assertEq("-", lower[23], "Fourth hyphen position");
+        assertEq(c"-", lower[8], "First hyphen position");
+        assertEq(c"-", lower[13], "Second hyphen position");
+        assertEq(c"-", lower[18], "Third hyphen position");
+        assertEq(c"-", lower[23], "Fourth hyphen position");
 
         # Check case consistency
         assertTrue(lower =~ /^[0-9a-f\-]+$/, "Lowercase contains only lowercase hex");
