@@ -75,12 +75,12 @@ UUID uuid("93c40733-9b99-46c6-91a5-f3989067dc1e");
 UUID uuid(UUID::Empty);
     @endcode
  */
-UUID::constructor(int flags = {Qore::UUID::None}QUF_NONE) {
+UUID::constructor(int flags = {Qore::UUID::None}QUF_NONE) [flags=NAMED_ARGS] {
    self->setPrivate(CID_UUID, new QoreUUID((int)flags));
 }
 
 //! parses a string to construct a UUID
-/** @param uuid_str a UUID string in a format as in the following example: \c "93c40733-9b99-46c6-91a5-f3989067dc1e"
+/** @param uuid_string a UUID string in a format as in the following example: \c "93c40733-9b99-46c6-91a5-f3989067dc1e"
 
     @par Example:
     - to make a UUID object from an explicit value:
@@ -90,8 +90,8 @@ UUID uuid("93c40733-9b99-46c6-91a5-f3989067dc1e");
 
     @throw UUID-STRING-ERROR invalid UUID string (invalid format, invalid characters, etc)
  */
-UUID::constructor(string uuid_str) {
-   SimpleRefHolder<QoreUUID> uuid(new QoreUUID(*uuid_str, xsink));
+UUID::constructor(string uuid_string) [flags=NAMED_ARGS] {
+   SimpleRefHolder<QoreUUID> uuid(new QoreUUID(*uuid_string, xsink));
    if (*xsink)
       return;
  
@@ -110,7 +110,7 @@ UUID::copy() {
 }
 
 //! Returns the string representation of the UUID
-/** @param flag one of the @ref uuid_formatting_constants to affect the formatting of the %UUID string output
+/** @param format one of the @ref uuid_formatting_constants to affect the formatting of the %UUID string output
 
     @return the string representation of the UUID, ex: \c "f5c5fd74-5b3e-4f02-8772-f8a80da9b028"
 
@@ -119,8 +119,8 @@ UUID::copy() {
 string str = uuid.toString();
     @endcode
  */
-string UUID::toString(int flag = {Qore::UUID::LowerCase}QUF_LOWER_CASE) [flags=CONSTANT] {
-   return uuid->toString((int)flag);
+string UUID::toString(int format = {Qore::UUID::LowerCase}QUF_LOWER_CASE) [flags=CONSTANT,NAMED_ARGS] {
+   return uuid->toString((int)format);
 }
 
 //! Returns True if the current %UUID is the null %UUID, or False if not
@@ -155,7 +155,7 @@ uuid.generate();
 uuid.generate(UUID::Empty);
     @endcode
  */
-nothing UUID::generate(int flags = {Qore::UUID::None}QUF_NONE) {
+nothing UUID::generate(int flags = {Qore::UUID::None}QUF_NONE) [flags=NAMED_ARGS] {
    uuid->generate((int)flags);
 }
 
@@ -169,12 +169,12 @@ nothing UUID::generate(int flags = {Qore::UUID::None}QUF_NONE) {
 int rc = uuid.compare(other_uuid);
     @endcode
  */
-int UUID::compare(UUID[QoreUUID] other) [flags=CONSTANT] {
+int UUID::compare(UUID[QoreUUID] other) [flags=CONSTANT,NAMED_ARGS] {
    return uuid->compare(**other);
 }
 
 //! sets the UUID from the given string
-/** @param uuid_str a UUID string in a format as in the following example: \c "93c40733-9b99-46c6-91a5-f3989067dc1e"
+/** @param uuid_string a UUID string in a format as in the following example: \c "93c40733-9b99-46c6-91a5-f3989067dc1e"
 
     @par Example:
     @code{.py}
@@ -183,16 +183,16 @@ uuid.set("93c40733-9b99-46c6-91a5-f3989067dc1e");
 
     @throw UUID-STRING-ERROR invalid UUID string (invalid format, invalid characters, etc)
  */
-nothing UUID::set(string uuid_str) {
-   uuid->set(*uuid_str, xsink);
+nothing UUID::set(string uuid_string) [flags=NAMED_ARGS] {
+   uuid->set(*uuid_string, xsink);
 }
 
 //! Returns a UUID string without having to create a UUID object
-/** @param str_flag one of the @ref uuid_formatting_constants to affect the formatting of the %UUID string output
-    @param gen_flags @ref uuid_generation_constants combined with binary or to affect how the UUID is generated
+/** @param format one of the @ref uuid_formatting_constants to affect the formatting of the %UUID string output
+    @param flags @ref uuid_generation_constants combined with binary or to affect how the UUID is generated
     
     @return the string representation of the UUID according to the arguments, ex: \c "f5c5fd74-5b3e-4f02-8772-f8a80da9b028"
  */
-static string UUID::get(int str_flag = {Qore::UUID::LowerCase}QUF_LOWER_CASE, int gen_flags = {Qore::UUID::None}QUF_NONE) [flags=CONSTANT] {
-   return QoreUUID::get((int)str_flag, (int)gen_flags);
+static string UUID::get(int format = {Qore::UUID::LowerCase}QUF_LOWER_CASE, int flags = {Qore::UUID::None}QUF_NONE) [flags=CONSTANT,NAMED_ARGS] {
+   return QoreUUID::get((int)format, (int)flags);
 }

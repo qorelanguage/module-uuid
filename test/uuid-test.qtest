@@ -15,6 +15,7 @@ class UuidTest inherits QUnit::Test {
         addTestCase("time-based generation", \timeTest());
         addTestCase("literal UUID", \literalTest());
         addTestCase("parsed UUID", \parsedTest());
+        addTestCase("named argument calls", \namedArgumentTest());
         addTestCase("empty UUID", \emptyTest());
         addTestCase("static get", \staticGetTest());
         addTestCase("UUID format validation", \formatTest());
@@ -62,6 +63,28 @@ class UuidTest inherits QUnit::Test {
         doTests(uuid, "parsed");
     }
 
+    namedArgumentTest() {
+        UUID nil(flags: UUID::Empty);
+        assertTrue(nil.isNull(), "named constructor flags");
+
+        UUID uuid(uuid_string: "1b4e28ba-2fa1-11d2-883f-b9a761bde3fb");
+        assertEq("1B4E28BA-2FA1-11D2-883F-B9A761BDE3FB",
+            uuid.toString(format: UUID::UpperCase), "named toString format");
+
+        uuid.set(uuid_string: "ffffffff-ffff-ffff-ffff-ffffffffffff");
+        assertEq("ffffffff-ffff-ffff-ffff-ffffffffffff",
+            uuid.toString(format: UUID::LowerCase), "named set UUID string");
+        assertEq(1, uuid.compare(other: nil), "named compare");
+
+        uuid.generate(flags: UUID::Empty);
+        assertTrue(uuid.isNull(), "named generate flags");
+
+        string generated = UUID::get(flags: UUID::Random, format: UUID::UpperCase);
+        assertEq(36, generated.length(), "named static get length");
+        assertTrue(generated =~ /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/,
+            "named static get uppercase format");
+    }
+
     emptyTest() {
         # Test generate with Empty flag
         UUID uuid();
@@ -105,10 +128,10 @@ class UuidTest inherits QUnit::Test {
 
         # Check format: 8-4-4-4-12
         assertEq(36, lower.length(), "UUID length");
-        assertEq("-", lower[8], "First hyphen position");
-        assertEq("-", lower[13], "Second hyphen position");
-        assertEq("-", lower[18], "Third hyphen position");
-        assertEq("-", lower[23], "Fourth hyphen position");
+        assertEq(c"-", lower[8], "First hyphen position");
+        assertEq(c"-", lower[13], "Second hyphen position");
+        assertEq(c"-", lower[18], "Third hyphen position");
+        assertEq(c"-", lower[23], "Fourth hyphen position");
 
         # Check case consistency
         assertTrue(lower =~ /^[0-9a-f\-]+$/, "Lowercase contains only lowercase hex");
