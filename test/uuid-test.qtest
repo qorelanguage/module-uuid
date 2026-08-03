@@ -3,6 +3,8 @@
 %requires uuid >= 1.1
 
 %modern
+# the code-flag test parses child Programs that need top-level statements
+%no-child-restrictions
 
 %requires QUnit
 
@@ -23,6 +25,7 @@ class UuidTest inherits QUnit::Test {
         addTestCase("compare functionality", \compareTest());
         addTestCase("negative tests", \negativeTest());
         addTestCase("corner cases", \cornerCaseTest());
+        addTestCase("code flags", \codeFlagTest());
 
         set_return_value(main());
     }
@@ -220,6 +223,32 @@ class UuidTest inherits QUnit::Test {
             }
             assertTrue(thrown, sprintf("Exception expected for set() with invalid UUID: '%s'", invalid));
         }
+    }
+
+    #! verifies that code flags describe each method's actual behavior
+    /** UUID::get() generates a new UUID and consumes entropy on every call, so discarding its
+        result is observable and it must not be advertised as side-effect free.  It used to carry
+        QCF_CONSTANT, which made the parser report the opposite and cleared the call's effect flag.
+        Accessors that really are side-effect free must keep reporting as such.
+    */
+    codeFlagTest() {
+        # Program::parse*() only returns warnings when a warning mask is passed; without one even a
+        # genuine warning is dropped, which would make the assertion at the end of this test vacuous
+        Program nomask(PO_NEW_STYLE);
+        assertEq(NOTHING, nomask.parse("trim('asdf ');", ""),
+            "without a warning mask no warning is returned at all");
+
+        # control: with the mask, a genuinely side-effect-free builtin does warn, so a missing
+        # warning below reflects the code flags and not the way this Program is set up
+        Program control(PO_NEW_STYLE);
+        *hash<auto> warn = control.parse("trim('asdf ');", "", WARN_RETURN_VALUE_IGNORED);
+        assertEq("RETURN-VALUE-IGNORED", warn.err, "control: trim() warns when its result is discarded");
+        assertRegex("does not have any side effects", warn.desc, "control: the warning text is as expected");
+
+        Program p(PO_NEW_STYLE);
+        p.loadModule("uuid");
+        assertEq(NOTHING, p.parse("UUID::get();", "", WARN_RETURN_VALUE_IGNORED),
+            "UUID::get() is not reported as side-effect free");
     }
 
     cornerCaseTest() {

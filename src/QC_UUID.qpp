@@ -3,7 +3,7 @@
 
   uuid Qore module
 
-  Copyright (C) 2010 - 2012 David Nichols
+  Copyright (C) 2010 - 2026 David Nichols
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -192,7 +192,11 @@ nothing UUID::set(string uuid_string) [flags=NAMED_ARGS] {
     @param flags @ref uuid_generation_constants combined with binary or to affect how the UUID is generated
     
     @return the string representation of the UUID according to the arguments, ex: \c "f5c5fd74-5b3e-4f02-8772-f8a80da9b028"
+
+    @note This method generates a new UUID on every call and consumes entropy in doing so, so calling
+    it and discarding the result is observable; it therefore carries no code flags affecting call
+    elision, and calls to it are never elided.
  */
-static string UUID::get(int format = {Qore::UUID::LowerCase}QUF_LOWER_CASE, int flags = {Qore::UUID::None}QUF_NONE) [flags=CONSTANT,NAMED_ARGS] {
+static string UUID::get(int format = {Qore::UUID::LowerCase}QUF_LOWER_CASE, int flags = {Qore::UUID::None}QUF_NONE) [flags=NAMED_ARGS] {
    return QoreUUID::get((int)format, (int)flags);
 }

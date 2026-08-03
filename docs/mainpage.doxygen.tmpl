@@ -39,6 +39,9 @@ string uuid = UUID::get();
     - fixed configure macro mismatch (HAS_UUID_UNPARSE_CASE -> HAVE_UUID_UNPARSE_CASE)
     - fixed UUID generation flag values to use proper bit flags (QUF_RANDOM, QUF_TIME, QUF_EMPTY were
       not powers of 2, causing UUID::Empty and other flags to not work correctly)
+    - fixed the code flags on static UUID::get(), which declared the method free of side effects; each
+      call generates a new UUID and consumes entropy, so discarding the return value is observable,
+      but the parser reported that such a call had no effect
 
     <b>Other Changes</b>
     - updated minimum %Qore version requirement to 0.9
